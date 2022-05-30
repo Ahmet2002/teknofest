@@ -9,7 +9,7 @@ class RosHandler:
 
     def connect(self, node: str, rate: int):
         rospy.init_node(node, anonymous=True)
-        self.rate = rospy.Rate(rate)
+        self.rate = rospy.Rate(self.rate)
         self.connected = True
         rospy.loginfo("Rospy is up ...")
         rospy.spin()
