@@ -4,12 +4,13 @@ from mavros_python_examples.topicService import TopicService
 
 class RosHandler:
     def __init__(self):
-        self.rate = 1
+        self.frequency = 2
         self.connected = False
+        
 
     def connect(self, node: str, rate: int):
         rospy.init_node(node, anonymous=True)
-        self.rate = rospy.Rate(self.rate)
+        self.rate = rospy.Rate(self.frequency)
         self.connected = True
         rospy.loginfo("Rospy is up ...")
         rospy.spin()
@@ -24,7 +25,7 @@ class RosHandler:
     def topic_publisher(topic: TopicService):
         pub = rospy.Publisher(topic.get_name(), topic.get_type(), queue_size=10)
         pub.publish(topic.get_data())
-        print("edfgedge")
+        print("Publishing")
 
     @staticmethod
     def topic_subscriber(topic: TopicService):
