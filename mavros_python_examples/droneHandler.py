@@ -8,11 +8,16 @@ import geometry_msgs.msg
 import math
 import rospy
 
-class Pose:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
+class Waypoint:
+    def __init__(self, x=0.0, y=0.0, z=0.0, is_open=False):
         self.x = x
         self.y = y
         self.z = z
+        self.is_open = is_open
+
+datas = {
+    "T" : [Waypoint(y=50.0), Waypoint(x=75.0, is_open=True),Waypoint(x=-37.5),Waypoint(y=-50.0, is_open=True)]
+}
 
 from mavros_python_examples.rospyHandler import RosHandler
 from mavros_python_examples.topicService import TopicService
@@ -43,6 +48,8 @@ class DroneHandler(RosHandler):
         self.yprime = 0.0
         self.zprime = 0.0
         self.yaw_vel = 0.0
+        self.box_width = 4.0
+        self.wps = []
 
         self.TOPIC_STATE = TopicService("/mavros/state", mavros_msgs.msg.State)
         self.SERVICE_ARM = TopicService("/mavros/cmd/arming", mavros_msgs.srv.CommandBool)
@@ -101,7 +108,7 @@ class DroneHandler(RosHandler):
         result = self.service_caller(self.SERVICE_SET_MODE, timeout=30)
         return result.mode_sent
 
-    def move(self, target: Pose):
+    def move(self, target: Waypoint):
         data = geometry_msgs.msg.PoseStamped()
         #data.header.stamp = rospy.Time.now()
         data.pose.position.x = target.x
@@ -122,7 +129,7 @@ class DroneHandler(RosHandler):
         self.topic_publisher(topic=self.TOPIC_SET_LIN_ANG_VEL)
 
     def move2target(self, x=0.0, y=0.0, z=3.0):
-        target_pose = Pose(x, y, z)
+        target_pose = Waypoint(x, y, z)
         while not rospy.is_shutdown():
             self.move(target_pose)
             self.print_pose()
@@ -130,7 +137,7 @@ class DroneHandler(RosHandler):
                 break
             self.rate.sleep()
 
-    def is_target_reached(self, target: Pose, tolerance=0.2):
+    def is_target_reached(self, target: Waypoint, tolerance=0.2):
         dx = self.x - target.x
         dy = self.y - target.y
         dz = self.z - target.z
@@ -164,6 +171,39 @@ class DroneHandler(RosHandler):
         self.SERVICE_SET_PARAM.set_data(data)
         result = self.service_caller(self.SERVICE_SET_PARAM, timeout=30)
         return result.success, result.value.integer, result.value.real
+
+    @staticmethod
+    def copy(wp: Waypoint):
+        return Waypoint(wp.x, wp.y, wp.z, wp.is_open)
+
+    def transform(self, current_wp: Waypoint, prev_wp: Waypoint): # not finished
+        current_wp.x += prev_wp.x
+        current_wp.y += prev_wp.y
+        current_wp.z += prev_wp.z
+        return current_wp
+
+    def get_mission(self, sentence: str): # Not finished
+        del self.wps
+        self.wps = []
+
+        prev_wp = Waypoint(self.x, self.y, self.z)
+        for c in sentence:
+            total_height = 0.0
+            total_width = 0.0
+            for wp in datas[c]:
+                new_wp = self.transform(self.copy(wp), prev_wp)
+                self.wps.append(new_wp)
+                prev_wp = new_wp
+                total_height += wp.y
+                total_width += wp.x
+            new_wp = self.transform(Waypoint(self.box_width - total_width, -total_height), prev_wp)
+            self.wps.append(new_wp)
+            prev_wp = new_wp
+
+    def run_mission(self):
+        for wp in self.wps:
+            self.is_open = wp.is_open
+            self.move2target(wp.x, wp.y, wp.z);
 
     def update_parameters_from_topic(self):
         while not (self.TOPIC_GET_POSE_GLOBAL.get_data() 
