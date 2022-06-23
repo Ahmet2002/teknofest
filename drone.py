@@ -18,15 +18,16 @@ class MyDroneHandler(DroneHandler):
         print("arm:", self.armed, "mode:", self.mode)
         print(str(self.change_mode(MODE_GUIDED)))
         self.arm(True)
-        self.takeoff(4)
+        self.takeoff(2.0)
         
-        while self.z < 3.96 :
+        while self.z < 1.97 :
             print(str(self.z))
             self.rate.sleep()
-        self.get_mission("T")
+
+        sentence = input("Please enter the sentence to be painted on the wall\n")
+        self.get_mission(sentence)
         self.run_mission()
-        #self.land()
-        self.change_mode(MODE_RTL)
+        self.land()
         while self.z > 0.03:
             print(str(self.z))
             self.rate.sleep()
