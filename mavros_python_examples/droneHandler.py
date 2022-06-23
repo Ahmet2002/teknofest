@@ -63,24 +63,24 @@ class Waypoint:
         self.is_open = is_open
 
 datas = {
-    "T" : { "list" : [Waypoint(y=3.0), Waypoint(x=3.0, is_open=True),Waypoint(x=-1.5),Waypoint(y=-3.0, is_open=True)],
+    "T" : { "list" : [Waypoint(x=3.0, is_open=True),Waypoint(x=-1.5),Waypoint(z=-3.0, is_open=True)],
             "width" : 3.5},
-    "E" : { "list" : [Waypoint(y=3.0, is_open=True), Waypoint(x=2.0, is_open=True), Waypoint(y=-1.5), Waypoint(x=-2.0, is_open=True), Waypoint(y=-1.5), Waypoint(2.0, is_open=True)],
+    "E" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=-2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=2.0, is_open=True)],
             "width" : 2.5},
-    "K" : { "list" : [Waypoint(y=3.0, is_open=True), Waypoint(2.0), Waypoint(-2.0, y=-1.5, is_open=True), Waypoint(2.0, y=-1.5, is_open=True)],
+    "K" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0, z=1.5, is_open=True), Waypoint(x=2.0, z=1.5, is_open=True)],
             "width" : 2.5},
-    "N" : { "list" : [Waypoint(y=3.0, is_open=True), Waypoint(2.0, y=-3.0, is_open=True), Waypoint(y=3.0, is_open=True)],
+    "N" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0 ,z=3.0, is_open=True), Waypoint(x=2.0), Waypoint(z=-3.0, is_open=True)],
             "width" : 2.5},
-    "O" : { "list" : [Waypoint(y=3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(y=-3.0, is_open=True), Waypoint(-2.0, is_open=True)],
+    "O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
             "width" : 2.5},
-    "F" : { "list" : [Waypoint(y=3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(y=-1.0), Waypoint(-2.0, is_open=True)],
+    "F" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=2.0), Waypoint(x=2.0, is_open=True), Waypoint(z=1.0), Waypoint(x=-2.0, is_open=True)],
             "width" : 2.5},
-    "S" : { "list" : [Waypoint(2.0, is_open=True), Waypoint(y=1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(y=1.5, is_open=True), Waypoint(2.0, is_open=True)], 
+    "S" : { "list" : [Waypoint(z=-3.0), Waypoint(2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(2.0, is_open=True)], 
             "width" : 2.5},
-    "2" : { "list" : [Waypoint(y=3.0), Waypoint(2.0, is_open=True), Waypoint(y=-1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(y=-1.5, is_open=True), Waypoint(2.0, is_open=True)],
+    "2" : { "list" : [Waypoint(2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(2.0, is_open=True)],
             "width" : 2.5},
-    "0" : { "list" : [Waypoint(y=3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(y=-3.0, is_open=True), Waypoint(-2.0, is_open=True)],
-            "width" : 2.5},
+    "O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
+            "width" : 2.5}
 }
 
 from mavros_python_examples.rospyHandler import RosHandler
@@ -115,7 +115,7 @@ class DroneHandler(RosHandler):
         self.yprime = 0.0
         self.zprime = 0.0
         self.yaw_vel = 0.0
-        self.k = 10.0
+        self.k = 1.0
         self.wps = []
 
         self.TOPIC_STATE = TopicService("/mavros/state", mavros_msgs.msg.State)
