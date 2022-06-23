@@ -79,7 +79,7 @@ datas = {
             "width" : 2.5},
     "2" : { "list" : [Waypoint(2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(2.0, is_open=True)],
             "width" : 2.5},
-    "O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
+    "0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
             "width" : 2.5}
 }
 
@@ -294,9 +294,9 @@ class DroneHandler(RosHandler):
                 new_wp = self.transform(self.copy(wp), prev_wp)
                 self.wps.append(new_wp)
                 prev_wp = new_wp
-                total_height += wp.y
+                total_height += wp.z
                 total_width += wp.x
-            new_wp = self.transform(Waypoint(box_width - total_width, -total_height), prev_wp)
+            new_wp = self.transform(Waypoint(x=(box_width - total_width), z=-total_height), prev_wp)
             self.wps.append(new_wp)
             prev_wp = new_wp
 
