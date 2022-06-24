@@ -5,10 +5,13 @@ import mavros_msgs.msg
 import mavros_msgs.srv
 import nav_msgs.msg
 import geometry_msgs.msg
+import sensor_msgs.msg
 import math
 import rospy
 import numpy as np
 from mavros_python_examples.dynamic_window_approach import *
+from mavros_python_examples.rospyHandler import RosHandler
+from mavros_python_examples.topicService import TopicService
 
 def angle2radian(angle: float):
     if angle < 0:
@@ -83,9 +86,6 @@ datas = {
             "width" : 2.5}
 }
 
-from mavros_python_examples.rospyHandler import RosHandler
-from mavros_python_examples.topicService import TopicService
-
 MODE_MANUAL = "MANUAL"
 MODE_ACRO = "ACRO"
 MODE_LEARNING = "LEARNING"
@@ -117,6 +117,9 @@ class DroneHandler(RosHandler):
         self.yaw_vel = 0.0
         self.k = 1.0
         self.wps = []
+        self.ranges = []
+        self.laser_count = 0
+        self.angle_increment = 0.0
 
         self.TOPIC_STATE = TopicService("/mavros/state", mavros_msgs.msg.State)
         self.SERVICE_ARM = TopicService("/mavros/cmd/arming", mavros_msgs.srv.CommandBool)
@@ -131,7 +134,7 @@ class DroneHandler(RosHandler):
         self.TOPIC_SET_LIN_ANG_VEL = TopicService("/mavros/setpoint_velocity/cmd_vel", geometry_msgs.msg.TwistStamped)
         self.TOPIC_GET_POSE_GLOBAL = TopicService("/mavros/global_position/local", nav_msgs.msg.Odometry)
         self.TOPIC_GET_VEL = TopicService("/mavros/local_pition/velocity_body", geometry_msgs.msg.TwistStamped)
-
+        self.TOPIC_SCAN = TopicService("/scan", sensor_msgs.msg.LaserScan)
 
         self.thread_param_updater = threading.Timer(0, self.update_parameters_from_topic)
         self.thread_param_updater.daemon = True
@@ -140,6 +143,7 @@ class DroneHandler(RosHandler):
     def enable_topics_for_read(self):
         self.topic_subscriber(self.TOPIC_STATE)
         self.topic_subscriber(self.TOPIC_GET_POSE_GLOBAL)
+        self.topic_subscriber(self.TOPIC_SCAN)
 
     def arm(self, status: bool):
         data = mavros_msgs.srv.CommandBoolRequest()
@@ -220,6 +224,11 @@ class DroneHandler(RosHandler):
             if dist_to_goal <= config.robot_radius:
                 print("Goal!!")
                 break
+
+    def print_ranges(self):
+        for i in range(self.laser_count):
+            angle = 180 / math.pi * (-math.pi + i * self.angle_increment)
+            print(f"({angle}, {self.ranges[i]})")
 
     def move2target(self, x=0.0, y=0.0, z=3.0, yaw=None):
         if not yaw:
@@ -313,12 +322,17 @@ class DroneHandler(RosHandler):
 
     def update_parameters_from_topic(self):
         while not (self.TOPIC_GET_POSE_GLOBAL.get_data() 
-            and self.TOPIC_STATE.get_data()):
+            and self.TOPIC_STATE.get_data()
+            and self.TOPIC_SCAN.get_data()):
             time.sleep(1)
+
+        self.angle_increment = self.TOPIC_SCAN.get_data().angle_increment
+        self.laser_count = int(math.pi * 2 / self.angle_increment)
         while True:
             if self.connected:
                 state_data = self.TOPIC_STATE.get_data()
                 geo_data = self.TOPIC_GET_POSE_GLOBAL.get_data()
+                scan_data = self.TOPIC_SCAN.get_data()
                 self.mode = state_data.mode
                 self.armed = state_data.armed
                 self.x = geo_data.pose.pose.position.x
@@ -333,5 +347,5 @@ class DroneHandler(RosHandler):
                 z = self.TOPIC_GET_POSE_GLOBAL.get_data().pose.pose.orientation.z
                 (self.roll, self.pitch, self.yaw) = quaternion_to_euler(w, x, y, z)
                 self.roll = angle2radian(self.roll); self.pitch = angle2radian(self.pitch); self.yaw = angle2radian(self.yaw);
-
+                self.ranges = scan_data.ranges
                 self.rate.sleep()
