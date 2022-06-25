@@ -242,7 +242,7 @@ class DroneHandler(RosHandler):
                 break
             self.rate.sleep()
 
-    def is_target_reached(self, x, y, z, yaw, tolerance_lin=1.0, tolerance_ang=0.7):
+    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.5, tolerance_ang=0.2):
         dx = self.x - x
         dy = self.y - y
         dz = self.z - z
