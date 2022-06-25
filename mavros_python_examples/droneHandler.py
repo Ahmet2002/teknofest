@@ -12,93 +12,7 @@ import numpy as np
 from mavros_python_examples.dynamic_window_approach import *
 from mavros_python_examples.rospyHandler import RosHandler
 from mavros_python_examples.topicService import TopicService
-
-def angle2radian(angle: float):
-    if angle < 0:
-        angle += 360.0
-    return (angle * math.pi / 180)
-
-def get_quaternion_from_euler(roll, pitch, yaw):
-  """
-  Convert an Euler angle to a quaternion.
-   
-  Input
-    :param roll: The roll (rotation around x-axis) angle in radians.
-    :param pitch: The pitch (rotation around y-axis) angle in radians.
-    :param yaw: The yaw (rotation around z-axis) angle in radians.
- 
-  Output
-    :return qx, qy, qz, qw: The orientation in quaternion [x,y,z,w] format
-  """
-  qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-  qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
-  qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
-  qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
- 
-  return [qx, qy, qz, qw]
-
-def quaternion_to_euler(w, x, y, z):
-    ysqr = y * y
-
-    t0 = +2.0 * (w * x + y * z)
-    t1 = +1.0 - 2.0 * (x * x + ysqr)
-    X = np.degrees(np.arctan2(t0, t1))
-
-    t2 = +2.0 * (w * y - z * x)
-    t2 = np.where(t2>+1.0,+1.0,t2)
-    #t2 = +1.0 if t2 > +1.0 else t2
-
-    t2 = np.where(t2<-1.0, -1.0, t2)
-    #t2 = -1.0 if t2 < -1.0 else t2
-    Y = np.degrees(np.arcsin(t2))
-
-    t3 = +2.0 * (w * z + x * y)
-    t4 = +1.0 - 2.0 * (ysqr + z * z)
-    Z = np.degrees(np.arctan2(t3, t4))
-
-    return X, Y, Z 
-
-class Waypoint:
-    def __init__(self, x=0.0, y=0.0, z=0.0, is_open=False):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.is_open = is_open
-
-datas = {
-    "T" : { "list" : [Waypoint(x=3.0, is_open=True),Waypoint(x=-1.5),Waypoint(z=-3.0, is_open=True)],
-            "width" : 3.5},
-    "E" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=-2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=2.0, is_open=True)],
-            "width" : 2.5},
-    "K" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0, z=1.5, is_open=True), Waypoint(x=2.0, z=1.5, is_open=True)],
-            "width" : 2.5},
-    "N" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0 ,z=3.0, is_open=True), Waypoint(x=2.0), Waypoint(z=-3.0, is_open=True)],
-            "width" : 2.5},
-    "O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
-            "width" : 2.5},
-    "F" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=2.0), Waypoint(x=2.0, is_open=True), Waypoint(z=1.0), Waypoint(x=-2.0, is_open=True)],
-            "width" : 2.5},
-    "S" : { "list" : [Waypoint(z=-3.0), Waypoint(2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(2.0, is_open=True)], 
-            "width" : 2.5},
-    "2" : { "list" : [Waypoint(2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(2.0, is_open=True)],
-            "width" : 2.5},
-    "0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
-            "width" : 2.5}
-}
-
-MODE_MANUAL = "MANUAL"
-MODE_ACRO = "ACRO"
-MODE_LEARNING = "LEARNING"
-MODE_STEERING = "STEERING"
-MODE_HOLD = "HOLD"
-MODE_LOITER = "LOITER"
-MODE_FOLLOW = "FOLLOW"
-MODE_SIMPLE = "SIMPLE"
-MODE_AUTO = "AUTO"
-MODE_RTL = "RTL"
-MODE_SMART_RTL = "SMART_RTL"
-MODE_GUIDED = "GUIDED"
-MODE_INITIALISING = "INITIALISING"
+from mavros_python_examples.utils import *
 
 class DroneHandler(RosHandler):
     def __init__(self):
@@ -181,28 +95,6 @@ class DroneHandler(RosHandler):
         result = self.service_caller(self.SERVICE_SET_MODE, timeout=30)
         return result.mode_sent
 
-    def move(self, x, y, z, yaw):
-        data = geometry_msgs.msg.PoseStamped()
-        #data.header.stamp = rospy.Time.now()
-        data.pose.position.x = x
-        data.pose.position.y = y
-        data.pose.position.z = z
-        (data.pose.orientation.x,data.pose.orientation.y,data.pose.orientation.z,
-        data.pose.orientation.w) = get_quaternion_from_euler(self.roll, self.pitch, yaw)
-        self.TOPIC_SET_POSE_GLOBAL.set_data(data)
-        self.topic_publisher(topic=self.TOPIC_SET_POSE_GLOBAL)
-
-    def set_vel(self, xprime=0.0, yprime=0.0, zprime=0.0, yaw_vel=0.0):
-        data = geometry_msgs.msg.TwistStamped()
-        data.twist.linear.x = xprime
-        data.twist.linear.y = yprime
-        data.twist.linear.z = zprime
-        data.twist.angular.z = yaw_vel
-        data.twist.angular.y = 0.0
-        data.twist.angular.x = 0.0
-        self.TOPIC_SET_LIN_ANG_VEL.set_data(data)
-        self.topic_publisher(topic=self.TOPIC_SET_LIN_ANG_VEL)
-
     def move_safe(self, gx=0.0, gy=0.0, gz=1.0, robot_type=RobotType.circle):
         print("Started !")
         self.move2target(self.x, self.y, gz)
@@ -231,6 +123,28 @@ class DroneHandler(RosHandler):
         for i in range(self.laser_count):
             angle = 180 / math.pi * (-math.pi + i * self.angle_increment)
             print(f"({angle}, {self.ranges[i]})")
+
+    def move(self, x, y, z, yaw):
+        data = geometry_msgs.msg.PoseStamped()
+        #data.header.stamp = rospy.Time.now()
+        data.pose.position.x = x
+        data.pose.position.y = y
+        data.pose.position.z = z
+        (data.pose.orientation.x,data.pose.orientation.y,data.pose.orientation.z,
+        data.pose.orientation.w) = get_quaternion_from_euler(self.roll, self.pitch, yaw)
+        self.TOPIC_SET_POSE_GLOBAL.set_data(data)
+        self.topic_publisher(topic=self.TOPIC_SET_POSE_GLOBAL)
+
+    def set_vel(self, xprime=0.0, yprime=0.0, zprime=0.0, yaw_vel=0.0):
+        data = geometry_msgs.msg.TwistStamped()
+        data.twist.linear.x = xprime
+        data.twist.linear.y = yprime
+        data.twist.linear.z = zprime
+        data.twist.angular.z = yaw_vel
+        data.twist.angular.y = 0.0
+        data.twist.angular.x = 0.0
+        self.TOPIC_SET_LIN_ANG_VEL.set_data(data)
+        self.topic_publisher(topic=self.TOPIC_SET_LIN_ANG_VEL)
 
     def move2target(self, x=0.0, y=0.0, z=3.0, yaw=None):
         if not yaw:
