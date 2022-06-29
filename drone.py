@@ -18,16 +18,22 @@ class MyDroneHandler(DroneHandler):
         
         print("arm:", self.armed, "mode:", self.mode)
         print(str(self.change_mode(MODE_GUIDED)))
+        (success, integer, real) = self.set_param("WPNAV_SPEED", value_real=200.0)
+        print(str(success), str(integer), str(real))
         self.arm(True)
-        self.takeoff(10.0)
+        self.takeoff(1.0)
 
-        self.move_local(x=5.0)
-        self.move_local(y=5.0)
+        self.move_global(x=5.0)
+        # while True:
+        #     self.set_vel_global(0.1)
+        #     self.rate.sleep()
+        # self.move_local(x=0.3)
+        # self.move_local(y=0.3)
         # while True:
         #     print(f"yaw = {self.yaw * 180 /math.pi}")
         #     print("range for angle 0" + str(self.range_for_angle(0.0)))
         #     time.sleep(1)
-        # self.move2target(x=0.0, y=0.0, yaw=270.0)
+        # self.move_global(yaw=270.0)
         # time.sleep(2)
         # self.align()
 

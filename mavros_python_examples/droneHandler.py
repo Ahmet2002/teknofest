@@ -29,7 +29,7 @@ class DroneHandler(RosHandler):
         self.yprime = 0.0
         self.zprime = 0.0
         self.yaw_vel = 0.0
-        self.k = 1.0
+        self.k = 1.5
         self.kp_alignment = 0.3
         self.wps = []
         self.ranges = []
@@ -46,7 +46,6 @@ class DroneHandler(RosHandler):
         self.SERVICE_SET_PARAM = TopicService("/mavros/param/set", mavros_msgs.srv.ParamSet)
         self.SERVICE_GET_PARAM = TopicService("/mavros/param/get", mavros_msgs.srv.ParamGet)
         self.TOPIC_SET_POSE_GLOBAL = TopicService('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped)
-        self.TOPIC_SET_POSE_LOCAL = TopicService('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped)
         self.TOPIC_SET_LIN_ANG_VEL = TopicService("/mavros/setpoint_velocity/cmd_vel_unstamped", geometry_msgs.msg.Twist)
         self.TOPIC_GET_POSE_GLOBAL = TopicService("/mavros/global_position/local", nav_msgs.msg.Odometry)
         self.TOPIC_GET_VEL = TopicService("/mavros/local_position/velocity_body", geometry_msgs.msg.TwistStamped)
@@ -60,7 +59,8 @@ class DroneHandler(RosHandler):
     def enable_topics_for_read(self):
         self.topic_subscriber(self.TOPIC_STATE)
         self.topic_subscriber(self.TOPIC_GET_POSE_GLOBAL)
-        self.topic_subscriber(self.TOPIC_SIM_SCAN)
+        self.topic_subscriber(self.TOPIC_GET_VEL)
+        # self.topic_subscriber(self.TOPIC_SIM_SCAN)
         # self.topic_subscriber(self.TOPIC_SCAN)
 
     def arm(self, status: bool):
@@ -100,7 +100,7 @@ class DroneHandler(RosHandler):
 
     def land(self):
         self.land_internal()
-        while self.z > 0.03:
+        while self.z > 0.05:
             print(str(self.z))
             self.rate.sleep()
 
@@ -113,7 +113,7 @@ class DroneHandler(RosHandler):
 
     def move_safe(self, gx=0.0, gy=0.0, gz=1.0, robot_type=RobotType.circle):
         print("Started !")
-        self.move2target_global(self.x, self.y, gz)
+        self.move_global(self.x, self.y, gz)
         # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
         x = np.array([self.x, self.y, self.yaw, math.hypot(self.xprime, self.yprime), self.yaw_vel])
         # goal position [x(m), y(m)]
@@ -128,7 +128,7 @@ class DroneHandler(RosHandler):
             u, predicted_trajectory = dwa_control(x, config, goal, ob)
             x = motion(x, u, config.dt)  # simulate robot
             trajectory = np.vstack((trajectory, x))  # store state history
-            self.move2target_global(x[0], x[1], self.z, x[2])
+            self.move_global(x[0], x[1], self.z, x[2])
             # check reaching goal
             dist_to_goal = math.hypot(x[0] - goal[0], x[1] - goal[1])
             if dist_to_goal <= config.robot_radius:
@@ -154,25 +154,18 @@ class DroneHandler(RosHandler):
             if (right > 12.0) or (left > 12.0):
                 print("abc")
                 if right != "inf":
-                    self.set_vel(yaw_vel=-MAX_YAW_VEL)
+                    self.set_vel_global(yaw_vel=-MAX_YAW_VEL)
                 else:
-                    self.set_vel(yaw_vel=MAX_YAW_VEL)
+                    self.set_vel_global(yaw_vel=MAX_YAW_VEL)
             else:
                 diff = right - left
                 if abs(diff) < 0.005:
                     break
                 else:
-                    self.set_vel(yaw_vel=self.kp_alignment * diff)
+                    self.set_vel_global(yaw_vel=self.kp_alignment * diff)
             self.rate.sleep()
 
-
-        # def align2(self):
-        #     while True:
-        #         first = self.range_for_angle(0.0)
-
-
-
-    def move_global(self, x, y, z, yaw):
+    def move_global_internal(self, x, y, z, yaw):
         data = geometry_msgs.msg.PoseStamped()
         #data.header.stamp = rospy.Time.now()
         data.pose.position.x = x
@@ -183,18 +176,8 @@ class DroneHandler(RosHandler):
         self.TOPIC_SET_POSE_GLOBAL.set_data(data)
         self.topic_publisher(topic=self.TOPIC_SET_POSE_GLOBAL)
 
-    # def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0):
-    #     data = geometry_msgs.msg.PoseStamped()
-    #     #data.header.stamp = rospy.Time.now()
-    #     data.pose.position.x = x
-    #     data.pose.position.y = y
-    #     data.pose.position.z = z
-    #     (data.pose.orientation.x,data.pose.orientation.y,data.pose.orientation.z,
-    #     data.pose.orientation.w) = get_quaternion_from_euler(0.0, 0.0, yaw)
-    #     self.TOPIC_SET_POSE_LOCAL.set_data(data)
-    #     self.topic_publisher(topic=self.TOPIC_SET_POSE_LOCAL)
 
-    def set_vel(self, xprime=0.0, yprime=0.0, zprime=0.0, yaw_vel=0.0):
+    def set_vel_global(self, xprime=0.0, yprime=0.0, zprime=0.0, yaw_vel=0.0):
         data = geometry_msgs.msg.Twist()
         data.linear.x = xprime
         data.linear.y = yprime
@@ -205,7 +188,7 @@ class DroneHandler(RosHandler):
         self.TOPIC_SET_LIN_ANG_VEL.set_data(data)
         self.topic_publisher(topic=self.TOPIC_SET_LIN_ANG_VEL)
 
-    def move2target_global(self, x=None, y=None, z=None, yaw=None):
+    def move_global(self, x=None, y=None, z=None, yaw=None):
         if not x:
             x = self.x
         if not y:
@@ -217,13 +200,13 @@ class DroneHandler(RosHandler):
         else:
             yaw = angle2radian(yaw)
         while not rospy.is_shutdown():
-            self.move_global(x, y, z, yaw)
-            self.print_pose()
+            self.move_global_internal(x, y, z, yaw)
+            self.print_vel()
             if self.is_target_reached(x, y, z, yaw):
                 break
             self.rate.sleep()
 
-    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.5, tolerance_ang=0.2):
+    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.3, tolerance_ang=2.0):
         dx = self.x - x
         dy = self.y - y
         dz = self.z - z
@@ -235,15 +218,18 @@ class DroneHandler(RosHandler):
         return False
 
     def print_pose(self):
+        print("----------------------------")
         print("X is : ", str(self.x))
         print("Y is : ", str(self.y))
         print("Z is : ", str(self.z))
         print("Yaw is : ", str(180 / math.pi * self.yaw))
 
     def print_vel(self):
+        print("----------------------------")
         print("x_prime : ", str(self.xprime))
         print("y_prime : ", str(self.yprime))
         print("z_prime : ", str(self.zprime))
+        print("yaw_vel = ", str(self.yaw_vel))
 
     def get_param(self, param: str):
         data = mavros_msgs.srv.ParamGetRequest()
@@ -252,7 +238,7 @@ class DroneHandler(RosHandler):
         result = self.service_caller(self.SERVICE_GET_PARAM, timeout=30)
         return result.success, result.value.integer, result.value.real
 
-    def set_param(self, param: str, value_integer: int, value_real: float):
+    def set_param(self, param: str, value_integer=0, value_real=0.0):
         data = mavros_msgs.srv.ParamSetRequest()
         data.param_id = param
         data.value.integer = value_integer
@@ -278,7 +264,7 @@ class DroneHandler(RosHandler):
         curr_loc = Waypoint(self.x, self.y, self.z)
         local_diff = Waypoint(x, y, z)
         target_loc = self.transform(local_diff, curr_loc)
-        self.move2target_global(target_loc.x, target_loc.y, target_loc.z, angle2radian(self.yaw) + yaw)
+        self.move_global(target_loc.x, target_loc.y, target_loc.z, 180 / math.pi * self.yaw + yaw)
 
     def get_mission(self, sentence: str):
         del self.wps
@@ -304,7 +290,8 @@ class DroneHandler(RosHandler):
     def run_mission(self):
         for wp in self.wps:
             self.is_open = wp.is_open
-            self.move2target_global(wp.x, wp.y, wp.z);
+            print("is open : ", str(self.is_open))
+            self.move_global(wp.x, wp.y, wp.z);
 
     def print_path(self):
         if not len(self.wps):
@@ -315,33 +302,35 @@ class DroneHandler(RosHandler):
     def update_parameters_from_topic(self):
         while not (self.TOPIC_GET_POSE_GLOBAL.get_data() 
             and self.TOPIC_STATE.get_data()
-            and self.TOPIC_SIM_SCAN.get_data()):
+            and self.TOPIC_GET_VEL.get_data()):
             time.sleep(1)
 
         # self.angle_increment = self.TOPIC_SCAN.get_data().angle_increment
         # self.laser_count = int(math.pi * 2 / self.angle_increment)
-        self.angle_increment = self.TOPIC_SIM_SCAN.get_data().angle_increment
-        self.laser_count = int(math.pi * 2 / self.angle_increment)
+        # self.angle_increment = self.TOPIC_SIM_SCAN.get_data().angle_increment
+        # self.laser_count = int(math.pi * 2 / self.angle_increment)
         while True:
             if self.connected:
                 state_data = self.TOPIC_STATE.get_data()
-                geo_data = self.TOPIC_GET_POSE_GLOBAL.get_data()
-                sim_scan_data = self.TOPIC_SIM_SCAN.get_data()
+                pose_data = self.TOPIC_GET_POSE_GLOBAL.get_data()
+                vel_data = self.TOPIC_GET_VEL.get_data()
+                # sim_scan_data = self.TOPIC_SIM_SCAN.get_data()
                 #scan_data = self.TOPIC_SCAN.get_data()
                 self.mode = state_data.mode
                 self.armed = state_data.armed
-                self.x = geo_data.pose.pose.position.x
-                self.y = geo_data.pose.pose.position.y
-                self.z = geo_data.pose.pose.position.z
-                self.xprime = geo_data.twist.twist.linear.x
-                self.yprime = geo_data.twist.twist.linear.y
-                self.zprime = geo_data.twist.twist.linear.z
-                w = self.TOPIC_GET_POSE_GLOBAL.get_data().pose.pose.orientation.w
-                x = self.TOPIC_GET_POSE_GLOBAL.get_data().pose.pose.orientation.x
-                y = self.TOPIC_GET_POSE_GLOBAL.get_data().pose.pose.orientation.y
-                z = self.TOPIC_GET_POSE_GLOBAL.get_data().pose.pose.orientation.z
+                self.x = pose_data.pose.pose.position.x
+                self.y = pose_data.pose.pose.position.y
+                self.z = pose_data.pose.pose.position.z
+                self.xprime = vel_data.twist.linear.x
+                self.yprime = vel_data.twist.linear.y
+                self.zprime = vel_data.twist.linear.z
+                self.yaw_vel = vel_data.twist.angular.z
+                w = pose_data.pose.pose.orientation.w
+                x = pose_data.pose.pose.orientation.x
+                y = pose_data.pose.pose.orientation.y
+                z = pose_data.pose.pose.orientation.z
                 (self.roll, self.pitch, self.yaw) = quaternion_to_euler(w, x, y, z)
                 self.roll = angle2radian(self.roll); self.pitch = angle2radian(self.pitch); self.yaw = angle2radian(self.yaw);
                 # self.ranges = scan_data.ranges
-                self.ranges = sim_scan_data.ranges
+                # self.ranges = sim_scan_data.ranges
                 self.rate.sleep()
