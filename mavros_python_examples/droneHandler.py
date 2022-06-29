@@ -49,7 +49,6 @@ class DroneHandler(RosHandler):
         self.TOPIC_GET_POSE_GLOBAL = TopicService("/mavros/global_position/local", nav_msgs.msg.Odometry)
         self.TOPIC_GET_VEL = TopicService("/mavros/local_position/velocity_body", geometry_msgs.msg.TwistStamped)
         self.TOPIC_SCAN = TopicService("/scan", sensor_msgs.msg.LaserScan)
-        self.TOPIC_SIM_SCAN = TopicService("/spur/laser/scan", sensor_msgs.msg.LaserScan)
 
         self.thread_param_updater = threading.Timer(0, self.update_parameters_from_topic)
         self.thread_param_updater.daemon = True
@@ -58,7 +57,7 @@ class DroneHandler(RosHandler):
     def enable_topics_for_read(self):
         self.topic_subscriber(self.TOPIC_STATE)
         self.topic_subscriber(self.TOPIC_GET_POSE_GLOBAL)
-        # self.topic_subscriber(self.TOPIC_SCAN)
+        self.topic_subscriber(self.TOPIC_SCAN)
 
     def arm(self, status: bool):
         data = mavros_msgs.srv.CommandBoolRequest()

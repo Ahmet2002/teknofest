@@ -19,9 +19,9 @@ class MyDroneHandler(DroneHandler):
         print("arm:", self.armed, "mode:", self.mode)
         print(str(self.change_mode(MODE_GUIDED)))
         self.arm(True)
-        self.takeoff(10.0)
+        self.takeoff(3.0)
         
-        while self.z < 9.94 :
+        while self.z < 2.94 :
             print(str(self.z))
             self.rate.sleep()
 
