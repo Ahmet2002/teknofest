@@ -46,6 +46,7 @@ class DroneHandler(RosHandler):
         self.SERVICE_SET_PARAM = TopicService("/mavros/param/set", mavros_msgs.srv.ParamSet)
         self.SERVICE_GET_PARAM = TopicService("/mavros/param/get", mavros_msgs.srv.ParamGet)
         self.TOPIC_SET_POSE_GLOBAL = TopicService('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped)
+        self.TOPIC_SET_POSE_LOCAL = TopicService('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped)
         self.TOPIC_SET_LIN_ANG_VEL = TopicService("/mavros/setpoint_velocity/cmd_vel_unstamped", geometry_msgs.msg.Twist)
         self.TOPIC_GET_POSE_GLOBAL = TopicService("/mavros/global_position/local", nav_msgs.msg.Odometry)
         self.TOPIC_GET_VEL = TopicService("/mavros/local_position/velocity_body", geometry_msgs.msg.TwistStamped)
@@ -112,7 +113,7 @@ class DroneHandler(RosHandler):
 
     def move_safe(self, gx=0.0, gy=0.0, gz=1.0, robot_type=RobotType.circle):
         print("Started !")
-        self.move2target(self.x, self.y, gz)
+        self.move2target_global(self.x, self.y, gz)
         # initial state [x(m), y(m), yaw(rad), v(m/s), omega(rad/s)]
         x = np.array([self.x, self.y, self.yaw, math.hypot(self.xprime, self.yprime), self.yaw_vel])
         # goal position [x(m), y(m)]
@@ -127,7 +128,7 @@ class DroneHandler(RosHandler):
             u, predicted_trajectory = dwa_control(x, config, goal, ob)
             x = motion(x, u, config.dt)  # simulate robot
             trajectory = np.vstack((trajectory, x))  # store state history
-            self.move2target(x[0], x[1], self.z, x[2])
+            self.move2target_global(x[0], x[1], self.z, x[2])
             # check reaching goal
             dist_to_goal = math.hypot(x[0] - goal[0], x[1] - goal[1])
             if dist_to_goal <= config.robot_radius:
@@ -171,7 +172,7 @@ class DroneHandler(RosHandler):
 
 
 
-    def move(self, x, y, z, yaw):
+    def move_global(self, x, y, z, yaw):
         data = geometry_msgs.msg.PoseStamped()
         #data.header.stamp = rospy.Time.now()
         data.pose.position.x = x
@@ -181,6 +182,17 @@ class DroneHandler(RosHandler):
         data.pose.orientation.w) = get_quaternion_from_euler(self.roll, self.pitch, yaw)
         self.TOPIC_SET_POSE_GLOBAL.set_data(data)
         self.topic_publisher(topic=self.TOPIC_SET_POSE_GLOBAL)
+
+    # def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0):
+    #     data = geometry_msgs.msg.PoseStamped()
+    #     #data.header.stamp = rospy.Time.now()
+    #     data.pose.position.x = x
+    #     data.pose.position.y = y
+    #     data.pose.position.z = z
+    #     (data.pose.orientation.x,data.pose.orientation.y,data.pose.orientation.z,
+    #     data.pose.orientation.w) = get_quaternion_from_euler(0.0, 0.0, yaw)
+    #     self.TOPIC_SET_POSE_LOCAL.set_data(data)
+    #     self.topic_publisher(topic=self.TOPIC_SET_POSE_LOCAL)
 
     def set_vel(self, xprime=0.0, yprime=0.0, zprime=0.0, yaw_vel=0.0):
         data = geometry_msgs.msg.Twist()
@@ -193,7 +205,7 @@ class DroneHandler(RosHandler):
         self.TOPIC_SET_LIN_ANG_VEL.set_data(data)
         self.topic_publisher(topic=self.TOPIC_SET_LIN_ANG_VEL)
 
-    def move2target(self, x=None, y=None, z=None, yaw=None):
+    def move2target_global(self, x=None, y=None, z=None, yaw=None):
         if not x:
             x = self.x
         if not y:
@@ -205,7 +217,7 @@ class DroneHandler(RosHandler):
         else:
             yaw = angle2radian(yaw)
         while not rospy.is_shutdown():
-            self.move(x, y, z, yaw)
+            self.move_global(x, y, z, yaw)
             self.print_pose()
             if self.is_target_reached(x, y, z, yaw):
                 break
@@ -254,10 +266,19 @@ class DroneHandler(RosHandler):
         return Waypoint(wp.x, wp.y, wp.z, wp.is_open)
 
     def transform(self, current_wp: Waypoint, prev_wp: Waypoint): # not finished
-        current_wp.y = current_wp.y * self.k + prev_wp.y
-        current_wp.x = current_wp.x * self.k + prev_wp.x
+
+        tempy = current_wp.y * self.k
+        tempx = current_wp.x * self.k
+        current_wp.x = math.cos(self.yaw) * tempx - math.sin(self.yaw) * tempy + prev_wp.x
+        current_wp.y = math.cos(self.yaw) * tempy + math.sin(self.yaw) * tempx + prev_wp.y
         current_wp.z = current_wp.z * self.k + prev_wp.z
         return current_wp
+
+    def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0):
+        curr_loc = Waypoint(self.x, self.y, self.z)
+        local_diff = Waypoint(x, y, z)
+        target_loc = self.transform(local_diff, curr_loc)
+        self.move2target_global(target_loc.x, target_loc.y, target_loc.z, angle2radian(self.yaw) + yaw)
 
     def get_mission(self, sentence: str):
         del self.wps
@@ -283,7 +304,7 @@ class DroneHandler(RosHandler):
     def run_mission(self):
         for wp in self.wps:
             self.is_open = wp.is_open
-            self.move2target(wp.x, wp.y, wp.z);
+            self.move2target_global(wp.x, wp.y, wp.z);
 
     def print_path(self):
         if not len(self.wps):
