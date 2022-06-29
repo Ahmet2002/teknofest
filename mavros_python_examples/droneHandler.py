@@ -30,6 +30,7 @@ class DroneHandler(RosHandler):
         self.zprime = 0.0
         self.yaw_vel = 0.0
         self.k = 1.0
+        self.kp_alignment = 0.3
         self.wps = []
         self.ranges = []
         self.laser_count = 0
@@ -45,10 +46,11 @@ class DroneHandler(RosHandler):
         self.SERVICE_SET_PARAM = TopicService("/mavros/param/set", mavros_msgs.srv.ParamSet)
         self.SERVICE_GET_PARAM = TopicService("/mavros/param/get", mavros_msgs.srv.ParamGet)
         self.TOPIC_SET_POSE_GLOBAL = TopicService('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped)
-        self.TOPIC_SET_LIN_ANG_VEL = TopicService("/mavros/setpoint_velocity/cmd_vel", geometry_msgs.msg.TwistStamped)
+        self.TOPIC_SET_LIN_ANG_VEL = TopicService("/mavros/setpoint_velocity/cmd_vel_unstamped", geometry_msgs.msg.Twist)
         self.TOPIC_GET_POSE_GLOBAL = TopicService("/mavros/global_position/local", nav_msgs.msg.Odometry)
         self.TOPIC_GET_VEL = TopicService("/mavros/local_position/velocity_body", geometry_msgs.msg.TwistStamped)
         self.TOPIC_SCAN = TopicService("/scan", sensor_msgs.msg.LaserScan)
+        self.TOPIC_SIM_SCAN = TopicService("/spur/laser/scan", sensor_msgs.msg.LaserScan)
 
         self.thread_param_updater = threading.Timer(0, self.update_parameters_from_topic)
         self.thread_param_updater.daemon = True
@@ -57,7 +59,8 @@ class DroneHandler(RosHandler):
     def enable_topics_for_read(self):
         self.topic_subscriber(self.TOPIC_STATE)
         self.topic_subscriber(self.TOPIC_GET_POSE_GLOBAL)
-        self.topic_subscriber(self.TOPIC_SCAN)
+        self.topic_subscriber(self.TOPIC_SIM_SCAN)
+        # self.topic_subscriber(self.TOPIC_SCAN)
 
     def arm(self, status: bool):
         data = mavros_msgs.srv.CommandBoolRequest()
@@ -66,7 +69,7 @@ class DroneHandler(RosHandler):
         result = self.service_caller(self.SERVICE_ARM, timeout=30)
         return result.success
 
-    def takeoff(self, altitude: float):
+    def takeoff_internal(self, altitude: float):
         data = mavros_msgs.srv.CommandTOLRequest()
         data.min_pitch = 0.0
         data.yaw = 0.0
@@ -77,7 +80,13 @@ class DroneHandler(RosHandler):
         result = self.service_caller(self.SERVICE_TAKEOFF, timeout=30)
         return result.success
 
-    def land(self):
+    def takeoff(self, altitude=3.0, tolerance=0.03):
+        self.takeoff_internal(altitude)
+        while self.z < altitude - tolerance:
+            print(str(self.z))
+            self.rate.sleep()
+
+    def land_internal(self):
         data = mavros_msgs.srv.CommandTOLRequest()
         data.altitude = 0.0
         data.latitude = 0.0
@@ -87,6 +96,12 @@ class DroneHandler(RosHandler):
         self.SERVICE_LAND.set_data(data)
         result = self.service_caller(self.SERVICE_LAND, timeout=30)
         return result.success
+
+    def land(self):
+        self.land_internal()
+        while self.z > 0.03:
+            print(str(self.z))
+            self.rate.sleep()
 
     def change_mode(self, mode: str):
         data = mavros_msgs.srv.SetModeRequest()
@@ -124,6 +139,38 @@ class DroneHandler(RosHandler):
             angle = 180 / math.pi * (-math.pi + i * self.angle_increment)
             print(f"({angle}, {self.ranges[i]})")
 
+    def range_for_angle(self, angle: float):
+        return self.ranges[int(float(self.laser_count) * (angle / 360 + 0.5))]
+
+    def align(self):
+        MAX_YAW_VEL = 0.2
+        while True:
+            print("yaw = ", str(180 / math.pi * self.yaw))
+            left = self.range_for_angle(5.0)
+            right = self.range_for_angle(-5.0)
+            print(f"right = {right}")
+            print(f"left = {left}")
+            if (right > 12.0) or (left > 12.0):
+                print("abc")
+                if right != "inf":
+                    self.set_vel(yaw_vel=-MAX_YAW_VEL)
+                else:
+                    self.set_vel(yaw_vel=MAX_YAW_VEL)
+            else:
+                diff = right - left
+                if abs(diff) < 0.005:
+                    break
+                else:
+                    self.set_vel(yaw_vel=self.kp_alignment * diff)
+            self.rate.sleep()
+
+
+        # def align2(self):
+        #     while True:
+        #         first = self.range_for_angle(0.0)
+
+
+
     def move(self, x, y, z, yaw):
         data = geometry_msgs.msg.PoseStamped()
         #data.header.stamp = rospy.Time.now()
@@ -136,19 +183,27 @@ class DroneHandler(RosHandler):
         self.topic_publisher(topic=self.TOPIC_SET_POSE_GLOBAL)
 
     def set_vel(self, xprime=0.0, yprime=0.0, zprime=0.0, yaw_vel=0.0):
-        data = geometry_msgs.msg.TwistStamped()
-        data.twist.linear.x = xprime
-        data.twist.linear.y = yprime
-        data.twist.linear.z = zprime
-        data.twist.angular.z = yaw_vel
-        data.twist.angular.y = 0.0
-        data.twist.angular.x = 0.0
+        data = geometry_msgs.msg.Twist()
+        data.linear.x = xprime
+        data.linear.y = yprime
+        data.linear.z = zprime
+        data.angular.z = yaw_vel
+        data.angular.y = 0.0
+        data.angular.x = 0.0
         self.TOPIC_SET_LIN_ANG_VEL.set_data(data)
         self.topic_publisher(topic=self.TOPIC_SET_LIN_ANG_VEL)
 
-    def move2target(self, x=0.0, y=0.0, z=3.0, yaw=None):
+    def move2target(self, x=None, y=None, z=None, yaw=None):
+        if not x:
+            x = self.x
+        if not y:
+            y = self.y
+        if not z:
+            z = self.z
         if not yaw:
             yaw = self.yaw
+        else:
+            yaw = angle2radian(yaw)
         while not rospy.is_shutdown():
             self.move(x, y, z, yaw)
             self.print_pose()
@@ -171,7 +226,7 @@ class DroneHandler(RosHandler):
         print("X is : ", str(self.x))
         print("Y is : ", str(self.y))
         print("Z is : ", str(self.z))
-        print("Yaw is : ", str(self.yaw))
+        print("Yaw is : ", str(180 / math.pi * self.yaw))
 
     def print_vel(self):
         print("x_prime : ", str(self.xprime))
@@ -238,15 +293,19 @@ class DroneHandler(RosHandler):
 
     def update_parameters_from_topic(self):
         while not (self.TOPIC_GET_POSE_GLOBAL.get_data() 
-            and self.TOPIC_STATE.get_data()):
+            and self.TOPIC_STATE.get_data()
+            and self.TOPIC_SIM_SCAN.get_data()):
             time.sleep(1)
 
         # self.angle_increment = self.TOPIC_SCAN.get_data().angle_increment
         # self.laser_count = int(math.pi * 2 / self.angle_increment)
+        self.angle_increment = self.TOPIC_SIM_SCAN.get_data().angle_increment
+        self.laser_count = int(math.pi * 2 / self.angle_increment)
         while True:
             if self.connected:
                 state_data = self.TOPIC_STATE.get_data()
                 geo_data = self.TOPIC_GET_POSE_GLOBAL.get_data()
+                sim_scan_data = self.TOPIC_SIM_SCAN.get_data()
                 #scan_data = self.TOPIC_SCAN.get_data()
                 self.mode = state_data.mode
                 self.armed = state_data.armed
@@ -263,4 +322,5 @@ class DroneHandler(RosHandler):
                 (self.roll, self.pitch, self.yaw) = quaternion_to_euler(w, x, y, z)
                 self.roll = angle2radian(self.roll); self.pitch = angle2radian(self.pitch); self.yaw = angle2radian(self.yaw);
                 # self.ranges = scan_data.ranges
+                self.ranges = sim_scan_data.ranges
                 self.rate.sleep()
