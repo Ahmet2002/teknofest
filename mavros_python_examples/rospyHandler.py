@@ -4,7 +4,7 @@ from mavros_python_examples.topicService import TopicService
 
 class RosHandler:
     def __init__(self):
-        self.frequency = 2
+        self.frequency = 10
         self.connected = False
         
 

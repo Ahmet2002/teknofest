@@ -36,9 +36,9 @@ class DroneHandler(RosHandler):
         self.angle_increment = 0.0
         self.target_distance_to_wall = 2.0
         self.kp_target_distance_to_wall = 0.2
-        self.kp_alignment = 2.0
+        self.kp_alignment = 2.5
         self.MAX_YAW_VEL = 0.5
-        self.sim_lidar_mode = False
+        self.sim_lidar_mode = True
         self.real_lidar_mode = False
         self.odom_ready = False
 
@@ -160,7 +160,7 @@ class DroneHandler(RosHandler):
             print(f"left = {left}")
             if (right > 12.0) or (left > 12.0):
                 print("abc")
-                if right != "inf":
+                if right <= 12.0:
                     self.set_vel_global(yaw_vel=-self.MAX_YAW_VEL)
                 else:
                     self.set_vel_global(yaw_vel=self.MAX_YAW_VEL)
@@ -173,7 +173,7 @@ class DroneHandler(RosHandler):
                 elif diff * self.kp_alignment < -self.MAX_YAW_VEL:
                     self.set_vel_global(yaw_vel=-self.MAX_YAW_VEL)
                 else:
-                    self.set_vel_global(yaw_vel=self.kp_alignment * diff)
+                    self.set_vel_global(yaw_vel=(self.kp_alignment * diff))
             self.rate.sleep()
 
         mesafe = self.range_for_angle(0.0)
@@ -351,6 +351,7 @@ class DroneHandler(RosHandler):
             self.move_global_internal(x, y, z, yaw)
             self.print_vel()
             self.print_pose()
+            print("is nozzle open", str(self.is_open))
             print("mesafe = ", str(self.range_for_angle(0.0)))
             if self.is_target_reached(x, y, z, yaw):
                 break
@@ -391,7 +392,7 @@ class DroneHandler(RosHandler):
         if self.real_lidar_mode:
             self.angle_increment = self.TOPIC_SCAN.get_data().angle_increment
             self.laser_count = int(math.pi * 2 / self.angle_increment)
-        elif self.real_lidar_mode:
+        elif self.sim_lidar_mode:
             self.angle_increment = self.TOPIC_SIM_SCAN.get_data().angle_increment
             self.laser_count = int(math.pi * 2 / self.angle_increment)
         while True:

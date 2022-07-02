@@ -18,14 +18,14 @@ class MyDroneHandler(DroneHandler):
         
         print("arm:", self.armed, "mode:", self.mode)
         print(str(self.change_mode(MODE_GUIDED)))
-        (success, integer, real) = self.set_param("WPNAV_SPEED", value_real=50.0)
+        (success, integer, real) = self.set_param("WPNAV_SPEED", value_real=80.0)
         print(str(success), str(integer), str(real))
         self.arm(True)
-        self.takeoff(4.0)
+        self.takeoff(2.0)
 
-        self.move_global(yaw=180.0)
-        # time.sleep(2)
-        # self.initial_align()
+        self.move_global(yaw=140.0)
+        time.sleep(2)
+        self.initial_align()
 
         sentence = input("Please enter the sentence to be painted on the wall\n")
         self.get_mission(sentence)
