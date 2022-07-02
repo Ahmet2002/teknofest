@@ -53,6 +53,16 @@ class Waypoint:
         self.z = z
         self.is_open = is_open
 
+    def add(self, wp):
+        self.x += wp.x
+        self.y += wp.y
+        self.z += wp.z
+
+    def mul(self, scale):
+        self.x *= scale
+        self.y *= scale
+        self.z *= scale
+
 datas = {
     "T" : { "list" : [Waypoint(x=3.0, is_open=True),Waypoint(x=-1.5),Waypoint(z=-3.0, is_open=True)],
             "width" : 3.5},
