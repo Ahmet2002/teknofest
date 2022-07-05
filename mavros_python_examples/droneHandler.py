@@ -29,14 +29,15 @@ class DroneHandler(RosHandler):
         self.yprime = 0.0
         self.zprime = 0.0
         self.yaw_vel = 0.0
-        self.k = 0.5
+        self.k = 1.0
         self.wps = []
         self.ranges = []
         self.laser_count = 0
         self.angle_increment = 0.0
         self.target_distance_to_wall = 2.0
-        self.kp_target_distance_to_wall = 0.2
-        self.kp_alignment = 2.5
+        self.kp_linear_ver = 0.2
+        self.kp_linear_hor = 0.5
+        self.kp_angular = 2.5
         self.MAX_YAW_VEL = 0.5
         self.sim_lidar_mode = True
         self.real_lidar_mode = False
@@ -151,11 +152,11 @@ class DroneHandler(RosHandler):
     def range_for_angle(self, angle: float):
         return self.ranges[int(float(self.laser_count) * (angle / 360 + 0.5))]
 
-    def initial_align(self, tolerance_ang=0.01):
+    def initial_align(self, tolerance_ang=0.005):
         while True:
             print("yaw = ", str(180 / math.pi * self.yaw))
-            left = self.range_for_angle(1.0)
-            right = self.range_for_angle(-1.0)
+            left = self.range_for_angle(5.0)
+            right = self.range_for_angle(-5.0)
             print(f"right = {right}")
             print(f"left = {left}")
             if (right > 12.0) or (left > 12.0):
@@ -168,35 +169,64 @@ class DroneHandler(RosHandler):
                 diff = right - left
                 if abs(diff) < tolerance_ang:
                     break
-                elif diff * self.kp_alignment > self.MAX_YAW_VEL:
+                elif diff * self.kp_angular > self.MAX_YAW_VEL:
                     self.set_vel_global(yaw_vel=self.MAX_YAW_VEL)
-                elif diff * self.kp_alignment < -self.MAX_YAW_VEL:
+                elif diff * self.kp_angular < -self.MAX_YAW_VEL:
                     self.set_vel_global(yaw_vel=-self.MAX_YAW_VEL)
                 else:
-                    self.set_vel_global(yaw_vel=(self.kp_alignment * diff))
+                    self.set_vel_global(yaw_vel=(self.kp_angular * diff))
             self.rate.sleep()
 
         mesafe = self.range_for_angle(0.0)
         self.move_local(y=(mesafe - self.target_distance_to_wall))
 
-    def cruise_control(self, tolerance_ang=0.01, tolerance_lin=0.1):
-        left = self.range_for_angle(1.0)
-        right = self.range_for_angle(-1.0)
+    def cruise_control(self, x, y, z, vel, tolerance_ang=0.005, tolerance_lin=0.05, tolerance_distance=0.3):
+        xprime = 0.0
+        yprime = 0.0
+        y_prime_local = 0.0
+        zprime = 0.0
+        yaw_vel = 0.0
+        temp_wp = Waypoint()
+        left = self.range_for_angle(5.0)
+        right = self.range_for_angle(-5.0)
         front = self.range_for_angle(0.0)
         if (left > 12.0) or (right > 12.0):
             return False
         diff_ang = right - left
         if abs(diff_ang) > tolerance_ang:
-            if diff_ang * self.kp_alignment > self.MAX_YAW_VEL:
-                self.set_vel_global(yaw_vel=self.MAX_YAW_VEL)
-            elif diff_ang * self.kp_alignment < -self.MAX_YAW_VEL:
-                self.set_vel_global(yaw_vel=-self.MAX_YAW_VEL)
+            if diff_ang * self.kp_angular > self.MAX_YAW_VEL:
+                yaw_vel += self.MAX_YAW_VEL
+            elif diff_ang * self.kp_angular < -self.MAX_YAW_VEL:
+                yaw_vel += -self.MAX_YAW_VEL
             else:
-                self.set_vel_global(yaw_vel=self.kp_alignment * diff_ang)
+                yaw_vel +=self.kp_angular * diff_ang
 
         diff_lin = self.target_distance_to_wall - front
-        if diff_lin > tolerance_lin:
-            self.set_vel_local(yprime=-(diff_lin * self.kp_target_distance_to_wall))
+
+        if abs(diff_lin) > tolerance_lin:
+            yprime_local = -(diff_lin * self.kp_linear_ver)
+            temp_wp.y = yprime_local
+            temp_wp = self.transform(temp_wp)
+            xprime += temp_wp.x
+            yprime += temp_wp.y
+
+        diff_x = x - self.x
+        diff_y = y - self.y
+        diff_z = z - self.z
+        length = math.sqrt(math.pow(diff_x, 2) + math.pow(diff_y, 2) + math.pow(diff_z, 2))
+        diff_x /= length;diff_y /= length;diff_z /= length
+        
+        if length > tolerance_distance:
+            xprime += diff_x * vel
+            yprime += diff_y * vel
+            zprime += diff_z * vel
+        else:
+            ratio = length / tolerance_distance
+            xprime += diff_x * vel * ratio * self.kp_linear_hor
+            yprime += diff_y * vel * ratio * self.kp_linear_hor
+            zprime += diff_z * vel * ratio * self.kp_linear_hor
+
+        self.set_vel_global(xprime, yprime, zprime, yaw_vel)
         return True
 
 
@@ -246,7 +276,7 @@ class DroneHandler(RosHandler):
                 break
             self.rate.sleep()
 
-    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.3, tolerance_ang=0.2):
+    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.1, tolerance_ang=0.1):
         dx = self.x - x
         dy = self.y - y
         dz = self.z - z
@@ -291,14 +321,14 @@ class DroneHandler(RosHandler):
     def copy(wp: Waypoint):
         return Waypoint(wp.x, wp.y, wp.z, wp.is_open)
 
-    def transform(self, current_wp: Waypoint): # not finished
+    def transform(self, wp: Waypoint): # not finished
         yaw = self.yaw - math.pi / 2
-        tempy = current_wp.y
-        tempx = current_wp.x
-        current_wp.x = math.cos(yaw) * tempx - math.sin(yaw) * tempy
-        current_wp.y = math.cos(yaw) * tempy + math.sin(yaw) * tempx
-        current_wp.z = current_wp.z
-        return current_wp
+        tempy = wp.y
+        tempx = wp.x
+        wp.x = math.cos(yaw) * tempx - math.sin(yaw) * tempy
+        wp.y = math.cos(yaw) * tempy + math.sin(yaw) * tempx
+        wp.z = wp.z
+        return wp
 
     def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0):
         local_diff = Waypoint(x, y, z)
@@ -333,36 +363,24 @@ class DroneHandler(RosHandler):
             self.wps.append(new_wp)
             prev_wp = new_wp
 
-    def go_to_waypoint(self, x=None, y=None, z=None, yaw=None):
-        if not x:
-            x = self.x
-        if not y:
-            y = self.y
-        if not z:
-            z = self.z
-        if not yaw:
-            yaw = self.yaw
-        else:
-            yaw = angle2radian(yaw)
-            print(str(yaw))
+    def go_to_waypoint(self, x, y, z, vel):
         while not rospy.is_shutdown():
-            # if not self.cruise_control():
-            #     return False
-            self.move_global_internal(x, y, z, yaw)
+            if not self.cruise_control(x, y, z, vel):
+                return False
             self.print_vel()
             self.print_pose()
             print("is nozzle open", str(self.is_open))
             print("mesafe = ", str(self.range_for_angle(0.0)))
-            if self.is_target_reached(x, y, z, yaw):
-                break
+            if self.is_target_reached(x, y, z, self.yaw):
+                return True
             self.rate.sleep()
 
-    def run_mission(self):
+    def run_mission(self, vel=0.3):
         for wp in self.wps:
             self.is_open = wp.is_open
-            print("is open : ", str(self.is_open))
             if (self.sim_lidar_mode or self.real_lidar_mode):
-                self.go_to_waypoint(wp.x, wp.y, wp.z)
+                if not self.go_to_waypoint(wp.x, wp.y, wp.z, vel):
+                    break
             else:
                 self.move_global(wp.x, wp.y, wp.z)
 
