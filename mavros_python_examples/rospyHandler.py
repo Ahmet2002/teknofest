@@ -1,5 +1,5 @@
 import rospy
-from mavros_python_examples.topicService import TopicService
+from mavros_python_examples.service import Service
 
 
 class RosHandler:
@@ -22,17 +22,15 @@ class RosHandler:
             self.connected = False
 
     @staticmethod
-    def topic_publisher(topic: TopicService):
+    def topic_publisher(topic: Service):
         pub = rospy.Publisher(topic.get_name(), topic.get_type(), queue_size=10)
         pub.publish(topic.get_data())
         print("Publishing")
 
-    @staticmethod
-    def topic_subscriber(topic: TopicService):
+    def topic_subscriber(topic: Service):
         rospy.Subscriber(topic.get_name(), topic.get_type(), topic.set_data)
 
-    @staticmethod
-    def service_caller(service: TopicService, timeout=30):
+    def service_caller(self, service: Service, timeout=30):
         try:
             srv = service.get_name()
             typ = service.get_type()

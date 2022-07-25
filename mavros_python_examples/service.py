@@ -1,6 +1,6 @@
 
 
-class TopicService:
+class Service:
     def __init__(self, name: str, classType):
         self.__name = name
         self.__classType = classType
