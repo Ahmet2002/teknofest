@@ -35,4 +35,4 @@ class DroneHandler2(DroneHandler1):
         self.is_armed = data.armed
 
     def lidar_cb(self, data):
-        self.front = data.ranges[int(2 * math.pi / data.angle_increment / 2)]
+        self.front = data.ranges[int(math.pi / data.angle_increment)]

@@ -124,8 +124,8 @@ class DroneHandler3(DroneHandler2):
         print("yaw_vel = ", str(self.yaw_vel))
 
     def duvara_bak(self):
-        max_vel = 0.1
-        k = 0.5
+        max_vel = 0.3
+        k = 0.65
         prev_front = self.front
         self.set_vel_global(yaw_vel=0.1)
         while True:
@@ -135,11 +135,14 @@ class DroneHandler3(DroneHandler2):
                 self.set_vel_global(yaw_vel=max_vel)
                 print("range : max")
                 continue
-            diff = k * (prev_front - self.front)
+            print("prev_front is ", prev_front)
+            print("current_front is ", self.front)
+            diff = k * (prev_front - self.front) * 9 / prev_front
+            prev_front = self.front
             print(str(diff))
-            if diff < 1.0:
-                self.set_vel_global(yaw_vel=0.0)
-                break
+            # if abs(diff) * 9 / prev_front < 0.005:
+            #     self.set_vel_global(yaw_vel=0.0)
+            #     break
             if max_vel < diff:
                 self.set_vel_global(yaw_vel=max_vel)
             elif -max_vel > diff:

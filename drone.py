@@ -17,7 +17,9 @@ class MyDroneHandler(DroneHandler3):
             time.sleep(1)
 
         self.takeoff(5.0)
+        time.sleep(2.0)
         self.move_global(yaw=0.0)
+        self.move_local(y=-7.0)
         self.duvara_bak()
         # self.move_local(y=5.0)
 
