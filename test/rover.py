@@ -1,6 +1,6 @@
 import threading
 import time
-from mavros_python_examples.roverHandler import *
+from utilities.roverHandler import *
 
 
 class MyRoverHandler(RoverHandler):

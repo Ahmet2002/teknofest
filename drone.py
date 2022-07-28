@@ -1,6 +1,6 @@
 import threading
 import time
-from mavros_python_examples.droneHandler3 import *
+from utilities.droneHandler3 import *
 
 
 class MyDroneHandler(DroneHandler3):
@@ -15,15 +15,16 @@ class MyDroneHandler(DroneHandler3):
         while not self.connected:
             rospy.loginfo("Waiting to be connected.")
             time.sleep(1)
+
         self.takeoff(5.0)
+        self.move_global(yaw=0.0)
+        self.duvara_bak()
+        # self.move_local(y=5.0)
 
-        self.move_global(yaw=160.0)
-
-        sentence = input("Please enter the sentence to be painted on the wall\n")
-        self.get_mission(sentence)
-        self.run_mission()
-        (success, integer, real) = self.set_param("WPNAV_SPEED", value_real=400.0)
-        print(str(success), str(integer), str(real))
+        # sentence = input("Please enter the sentence to be painted on the wall\n")
+        # self.get_mission(sentence)
+        # self.run_mission()
+        
         self.change_mode(MODE_RTL)
         self.disconnect()
 
