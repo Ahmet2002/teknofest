@@ -53,7 +53,7 @@ class DroneHandler3(DroneHandler2):
         y += self.y
         self.move_global(x, y, self.z, 180 / math.pi * self.yaw + yaw)
 
-    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.3, tolerance_ang=0.2):
+    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.2, tolerance_ang=0.2):
         dx = self.x - x
         dy = self.y - y
         dz = self.z - z
@@ -81,11 +81,11 @@ class DroneHandler3(DroneHandler2):
             total_width = 0.0
             wp_lst = datas[c]["list"]
             box_width = datas[c]["width"]
-            print("box width : ", str(box_width * self.k))
+            print("box width : ", str(box_width * self.config.font_size))
             for wp in wp_lst:
                 new_wp = Waypoint(wp.x, wp.y, wp.z, wp.is_open)
                 (new_wp.x, new_wp.y) = self.transform(new_wp.x, 0.0)
-                new_wp.mul(self.k)
+                new_wp.mul(self.config.font_size)
                 new_wp.add(prev_wp)
                 self.wps.append(new_wp)
                 prev_wp = new_wp
@@ -93,15 +93,10 @@ class DroneHandler3(DroneHandler2):
                 total_width += wp.x
             new_wp = Waypoint(x=(box_width - total_width), z=-total_height)
             (new_wp.x, new_wp.y) = self.transform(new_wp.x, 0.0)
-            new_wp.mul(self.k)
+            new_wp.mul(self.config.font_size)
             new_wp.add(prev_wp)
             self.wps.append(new_wp)
             prev_wp = new_wp
-
-    def run_mission(self, vel=0.3):
-        for wp in self.wps:
-            self.is_open = wp.is_open
-            self.move_global(wp.x, wp.y, wp.z)
 
     def print_path(self):
         if not len(self.wps):
@@ -123,30 +118,53 @@ class DroneHandler3(DroneHandler2):
         print("z_prime : ", str(self.zprime))
         print("yaw_vel = ", str(self.yaw_vel))
 
-    def duvara_bak(self):
-        max_vel = 0.3
-        k = 0.65
+    def duvara_bak(self, distance=5.0):
+        vel = 0
+        count = 0
         prev_front = self.front
         self.set_vel_global(yaw_vel=0.1)
         while True:
             time.sleep(0.5)
             self.print_pose()
             if self.front > 12.0:
-                self.set_vel_global(yaw_vel=max_vel)
-                print("range : max")
+                self.set_vel_global(yaw_vel=self.config.max_yaw_vel)
                 continue
-            print("prev_front is ", prev_front)
-            print("current_front is ", self.front)
-            diff = k * (prev_front - self.front) * 9 / prev_front
+            vel = self.config.kp_yaw * (prev_front - self.front) / prev_front
             prev_front = self.front
-            print(str(diff))
-            # if abs(diff) * 9 / prev_front < 0.005:
-            #     self.set_vel_global(yaw_vel=0.0)
-            #     break
-            if max_vel < diff:
-                self.set_vel_global(yaw_vel=max_vel)
-            elif -max_vel > diff:
-                self.set_vel_global(yaw_vel=-max_vel)
-            else:
-                self.set_vel_global(yaw_vel=diff)
-            print("range : " + str(self.front))
+            if abs(vel) < 0.005:
+                count += 1
+            if count > 1:
+                self.set_vel_global(yaw_vel=0.0)
+                break
+            if self.config.max_yaw_vel < vel:
+                vel = self.config.max_yaw_vel
+            elif -self.config.max_yaw_vel > vel:
+                vel = -self.config.max_yaw_vel
+            self.set_vel_global(yaw_vel=vel)
+        self.move_local(y=(self.front - distance))
+
+    def cruise_control(self, config):
+        yaw_vel = 0
+        prev_front = self.front
+        if self.front > 12.0:
+            yaw_vel = config.max_yaw_vel
+        yaw_vel = config.kp_yaw * (prev_front - self.front) / prev_front
+        prev_front = self.front
+        if config.max_yaw_vel < yaw_vel:
+            yaw_vel = config.max_yaw_vel
+        elif -config.max_yaw_vel > yaw_vel:
+            yaw_vel = -config.max_yaw_vel
+        
+        return yaw_vel
+
+    def run_mission(self, vel=0.3):
+        for wp in self.wps:
+            self.is_open = wp.is_open
+            self.cruise_control(wp.x, wp.y, wp.z)
+    
+    def yazi_yaz(self, distance_to_wall):
+        self.duvara_bak(distance_to_wall)
+        sentence = input("Please enter the sentence to be painted on the wall\n")
+        self.get_mission(sentence)
+        self.run_mission()
+        rospy.logdebug("mission completed !")

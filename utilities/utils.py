@@ -110,3 +110,10 @@ MODE_GUIDED = "GUIDED"
 MODE_INITIALISING = "INITIALISING"
 
 
+
+class Config:
+	def __init__(self):
+		self.duvara_bakiyomu = False
+		self.kp_yaw = 6.0
+		self.max_yaw_vel = 0.3
+		self.font_size = 1.0

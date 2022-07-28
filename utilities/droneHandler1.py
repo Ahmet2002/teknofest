@@ -30,9 +30,10 @@ class DroneHandler1(RosHandler):
         self.yprime = 0.0
         self.zprime = 0.0
         self.yaw_vel = 0.0
-        self.k = 1.0
+        self.config = Config()
         self.front = 0.0
         self.wps = []
+        self.front_history = []
 
         
         self.service_arm = Service("/mavros/cmd/arming", mavros_msgs.srv.CommandBool)

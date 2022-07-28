@@ -19,13 +19,7 @@ class MyDroneHandler(DroneHandler3):
         self.takeoff(5.0)
         time.sleep(2.0)
         self.move_global(yaw=0.0)
-        self.move_local(y=-7.0)
-        self.duvara_bak()
-        # self.move_local(y=5.0)
-
-        # sentence = input("Please enter the sentence to be painted on the wall\n")
-        # self.get_mission(sentence)
-        # self.run_mission()
+        # self.move_local(y=-7.0)
         
         self.change_mode(MODE_RTL)
         self.disconnect()
