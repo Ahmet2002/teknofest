@@ -28,6 +28,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.front_history = []
         self.frequency = 10
         self.connected = False
+        self.is_init = False
 
         # Services
         self.service_arm = Service("/mavros/cmd/arming", mavros_msgs.srv.CommandBool)

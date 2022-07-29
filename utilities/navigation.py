@@ -30,6 +30,22 @@ class MixinNavigation:
             self.set_vel_global(yaw_vel=vel)
         self.move_local(y=(self.front - distance))
         self.is_init = False
+    
+    def init_wall(self, wall:Wall, distance=5.0):
+        self.duvara_bak(distance=distance)
+        self.go_most_down()
+        self.go_most_left()
+        p1 = Point()
+        p2 = Point()
+        (p1.x, p1.y, p1.z) = (self.x, self.y, self.z)
+        self.go_most_right()
+        self.go_most_up()
+        (p2.x, p2.y, p2.z) = (self.x, self.y, self.z)
+        wall.height = p2.z - p1.z
+        wall.width = get_distance(p1, p2)
+        wall.angle = math.atan2(p1.y - p2.y, p2.x- p2.x)
+
+        
 
     def combine_vels(self, x=0.0, y=0.0, z=0.0, is_global=True):
         pass
@@ -51,7 +67,7 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(x=0.25)
-        self.ranges_init
+        self.is_init = False
 
     def go_most_left(self, vel=0.5):
         while self.front < 40.0:
@@ -59,6 +75,7 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(x=-0.25)
+        self.is_init = False
 
     def go_most_up(self, vel=0.5):
         while self.front < 40.0:
@@ -66,6 +83,7 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(z=-0.25)
+        self.is_init = False
 
     def go_most_down(self, vel=0.5):
         while (self.front < 40.0) or (self.z > 2.0):
@@ -73,6 +91,7 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(z=-0.25)
+        self.is_init = False
     
     def get_mission(self, sentence: str):
         del self.wps
