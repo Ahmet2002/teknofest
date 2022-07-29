@@ -1,9 +1,10 @@
 import threading
 import time
-from utilities.droneHandler3 import *
+from utilities.droneHanler import DroneHandler
+from utilities.utils import *
 
 
-class MyDroneHandler(DroneHandler3):
+class MyDroneHandler(DroneHandler):
     def __init__(self):
         super().__init__()
 
@@ -19,7 +20,7 @@ class MyDroneHandler(DroneHandler3):
         self.takeoff(5.0)
         time.sleep(2.0)
         self.move_global(yaw=0.0)
-        # self.move_local(y=-7.0)
+        self.duvara_bak()
         
         self.change_mode(MODE_RTL)
         self.disconnect()

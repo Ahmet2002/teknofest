@@ -2,12 +2,7 @@ import rospy
 from utilities.service import Service
 
 
-class RosHandler:
-    def __init__(self):
-        self.frequency = 10
-        self.connected = False
-        
-
+class MixinRosHandler:
     def connect(self, node: str, rate: int):
         rospy.init_node(node, anonymous=True)
         self.rate = rospy.Rate(self.frequency)
