@@ -47,7 +47,7 @@ class MixinPublishing:
             self.rate.sleep()
 
     def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0):
-        (x, y) = target_loc = self.transform(x, y)
+        (x, y) = self.transform(x, y)
         x += self.x
         y += self.y
         self.move_global(x, y, self.z, 180 / math.pi * self.yaw + yaw)
