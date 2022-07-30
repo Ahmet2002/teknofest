@@ -22,6 +22,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.zprime = 0.0
         self.yaw_vel = 0.0
         self.config = Config()
+        self.wall = Wall()
         self.front = 0.0
         self.prev_front = 0.0
         self.wps = []

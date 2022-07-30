@@ -50,7 +50,8 @@ class MixinPublishing:
         (x, y) = self.transform(x, y)
         x += self.x
         y += self.y
-        self.move_global(x, y, self.z, 180 / math.pi * self.yaw + yaw)
+        z += self.z
+        self.move_global(x, y, z, 180 / math.pi * self.yaw + yaw)
 
     def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.2, tolerance_ang=0.2):
         dx = self.x - x
@@ -63,11 +64,12 @@ class MixinPublishing:
             return True
         return False
 
-    def transform(self, x:float, y:float): # not finished
-        yaw = self.yaw - math.pi / 2
+    def transform(self, x:float, y:float, angle=None): # not finished
+        if not angle:
+            angle= self.yaw - math.pi / 2
         tmp_x = x
-        x = math.cos(yaw) * tmp_x - math.sin(yaw) * y
-        y = math.cos(yaw) * y + math.sin(yaw) * tmp_x
+        x = math.cos(angle) * tmp_x - math.sin(angle) * y
+        y = math.cos(angle) * y + math.sin(angle) * tmp_x
         return x, y
 
     def print_pose(self):

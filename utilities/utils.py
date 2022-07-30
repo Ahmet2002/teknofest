@@ -74,30 +74,13 @@ class Point:
 		self.z *= scale
 
 class Waypoint(Point):
-	def __init__(self, is_open=False):
-		super().__init__()
+	def __init__(self, x=0.0, y=0.0, z=0.0, is_open=False):
+		self.x = x
+		self.y = y
+		self.z = z
 		self.is_open = is_open
 
-datas = {
-	"T" : { "list" : [Waypoint(x=3.0, is_open=True),Waypoint(x=-1.5),Waypoint(z=-3.0, is_open=True)],
-			"width" : 3.5},
-	"E" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=-2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=2.0, is_open=True)],
-			"width" : 2.5},
-	"K" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0, z=1.5, is_open=True), Waypoint(x=2.0, z=1.5, is_open=True)],
-			"width" : 2.5},
-	"N" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0 ,z=3.0, is_open=True), Waypoint(x=2.0), Waypoint(z=-3.0, is_open=True)],
-			"width" : 2.5},
-	"O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
-			"width" : 2.5},
-	"F" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=2.0), Waypoint(x=2.0, is_open=True), Waypoint(z=1.0), Waypoint(x=-2.0, is_open=True)],
-			"width" : 2.5},
-	"S" : { "list" : [Waypoint(z=-3.0), Waypoint(2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(2.0, is_open=True)], 
-			"width" : 2.5},
-	"2" : { "list" : [Waypoint(2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(2.0, is_open=True)],
-			"width" : 2.5},
-	"0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
-			"width" : 2.5}
-}
+
 
 MODE_MANUAL = "MANUAL"
 MODE_ACRO = "ACRO"
@@ -114,22 +97,60 @@ MODE_GUIDED = "GUIDED"
 MODE_INITIALISING = "INITIALISING"
 
 
+datas = {
+		"T" : { "list" : [Waypoint(x=3.0, is_open=True),Waypoint(x=-1.5),Waypoint(z=-3.0, is_open=True)],
+			"width" : 3.5},
+		"E" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=-2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=2.0, is_open=True)],
+			"width" : 2.5},
+		"K" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0, z=1.5, is_open=True), Waypoint(x=2.0, z=1.5, is_open=True)],
+			"width" : 2.5},
+		"N" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0 ,z=3.0, is_open=True), Waypoint(x=2.0), Waypoint(z=-3.0, is_open=True)],
+			"width" : 2.5},
+		"O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
+			"width" : 2.5},
+		"F" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=2.0), Waypoint(x=2.0, is_open=True), Waypoint(z=1.0), Waypoint(x=-2.0, is_open=True)],
+			"width" : 2.5},
+		"S" : { "list" : [Waypoint(z=-3.0), Waypoint(2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(2.0, is_open=True)], 
+			"width" : 2.5},
+		"2" : { "list" : [Waypoint(2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(2.0, is_open=True)],
+			"width" : 2.5},
+		"0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
+			"width" : 2.5}
+		}
+
 
 class Config:
 	def __init__(self):
 		self.duvara_bakiyomu = False
 		self.kp_yaw = 6.0
+		self.kp_nav = 0.5
+		self.min_distance = 0.5
 		self.max_yaw_vel = 0.3
-		self.font_size = 1.0
+		self.font_scale = 1.0
 
 class Wall:
 	def __init__(self):
 		self.height = 0.0
 		self.width = 0.0
 		self.angle = 0.0
+		self.is_init = False
 		self.origin = Point()
+		self.sentence = ""
+
+	
+	def in_borders(self, x, y):
+		if (x > 0.0) and (x < self.width):
+			if (y > 0.0) and (y < self.height):
+				return True
+		return False
+
+	def get_exact_loc(self, x, y, transform):
+		(ret_x, ret_y) = transform(x, 0.0, angle=self.angle)
+		ret_z = self.origin.z - y
+		return ret_x, ret_y, ret_z
 
 
-def get_distance(p1:Point, p2:Point):
-	(dx, dy, dz) = (p1.x - p2.x, p1.y - p2.y, p1.z - p2.z)
+
+def get_distance(x1, y1, z1, x2, y2, z2):
+	(dx, dy, dz) = (x1 - x2, y1 - y2, z1 - z2)
 	return math.sqrt(math.pow(dx, 2)+math.pow(dy, 2)+math.pow(dz, 2))
