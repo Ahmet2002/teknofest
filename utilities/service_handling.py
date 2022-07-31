@@ -1,6 +1,7 @@
 import time
 import rospy
 from utilities.utils import *
+from mavros_msgs.msg import Waypoint
 
 class MixinServiceHandler:
     def arm(self, status: bool):
@@ -69,3 +70,32 @@ class MixinServiceHandler:
         self.service_get_param.set_data(data)
         result = self.service_caller(self.service_set_param, timeout=30)
         return result.success
+
+    def push_wps(self):
+        data = mavros_msgs.srv.WaypointPushRequest()
+        data.start_index = 0
+        data.waypoints = self.wps
+        self.service_mission_push.set_data(data)
+        result = self.service_caller(self.service_mission_push, timeout=30)
+        return result.success
+
+    def clear_wps(self):
+        data = mavros_msgs.srv.WaypointClearRequest()
+        self.service_mission_clear.set_data(data)
+        result = self.service_caller(self.service_mission_clear, timeout=30)
+        return result.success
+        
+    def add_wp_to_wp_list(self,frame,command,is_current,autocontinue,param1,param2,param3,param4,x_lat,y_long,z_alt):
+        wp = Waypoint()
+        wp.frame =frame #  FRAME_GLOBAL_REL_ALT = 3 for more visit http://docs.ros.org/api/mavros_msgs/html/msg/Waypoint.html
+        wp.command = command #VTOL TAKEOFF = 84,NAV_WAYPOINT = 16, TAKE_OFF=22 for checking out other parameters go to https://github.com/mavlink/mavros/blob/master/mavros_msgs/msg/CommandCode.msg
+        wp.is_current= is_current
+        wp.autocontinue = autocontinue # enable taking and following upcoming waypoints automatically 
+        wp.param1=param1 # no idea what these are for but the script will work so go ahead
+        wp.param2=param2
+        wp.param3=param3
+        wp.param4=param4
+        wp.x_lat= x_lat 
+        wp.y_long=y_long
+        wp.z_alt= z_alt #relative altitude.
+        self.wps.append(wp)

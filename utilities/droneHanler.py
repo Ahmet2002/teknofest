@@ -15,6 +15,9 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
+        self.latitude = 0.0
+        self.altitude = 0.0
+        self.longitude = 0.0
         self.roll = 0.0
         self.pitch = 0.0
         self.yaw = 0.0
@@ -47,7 +50,8 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.pub_pose_global = rospy.Publisher('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped, queue_size=10)
 
         # Subscribers
-        self.sub_pose_global = rospy.Subscriber("/mavros/global_position/local", nav_msgs.msg.Odometry, self.pose_global_cb)
+        self.sub_pose_global = rospy.Subscriber("/mavros/global_position/local", nav_msgs.msg.Odometry, self.pose_rel_global_cb)
+        self.sub_pose_global = rospy.Subscriber("/mavros/global_position/global", sensor_msgs.msg.NavSatFix, self.pose_global_cb)
         self.sub_vel_global = rospy.Subscriber("/mavros/local_position/velocity_body", geometry_msgs.msg.TwistStamped, self.vel_global_cb)
         self.sub_state = rospy.Subscriber("/mavros/state", mavros_msgs.msg.State, self.state_cb)
         self.sub_lidar = rospy.Subscriber("/spur/laser/scan", sensor_msgs.msg.LaserScan, self.lidar_cb)

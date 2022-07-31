@@ -3,7 +3,7 @@ from utilities.utils import *
 
 
 class MixinSubscribing:
-    def pose_global_cb(self, data):
+    def pose_rel_global_cb(self, data):
         self.x = data.pose.pose.position.x
         self.y = data.pose.pose.position.y
         self.z = data.pose.pose.position.z
@@ -15,6 +15,11 @@ class MixinSubscribing:
         self.roll = angle2radian(self.roll)
         self.pitch = angle2radian(self.pitch)
         self.yaw = angle2radian(self.yaw)
+
+    def pose_global_cb(self, data):
+        self.altitude = data.altitude
+        self.longitude = data.longitude
+        self.latitude = data.latitude
 
     def vel_global_cb(self, data):
         self.xprime = data.twist.linear.x
@@ -28,3 +33,23 @@ class MixinSubscribing:
 
     def lidar_cb(self, data):
         self.front = data.ranges[int(math.pi / data.angle_increment)]
+
+    def print_pose(self):
+        print("----------------------------")
+        print("X is : ", str(self.x))
+        print("Y is : ", str(self.y))
+        print("Z is : ", str(self.z))
+        print("Yaw is : ", str(180 / math.pi * self.yaw))
+        print("front : ", self.front)
+
+    def print_pose_global(self):
+        print("latitude : ", self.latitude)
+        print("longitude : ", self.longitude)
+        print("altitude : ", self.altitude)
+
+    def print_vel(self):
+        print("----------------------------")
+        print("x_prime : ", str(self.xprime))
+        print("y_prime : ", str(self.yprime))
+        print("z_prime : ", str(self.zprime))
+        print("yaw_vel = ", str(self.yaw_vel))

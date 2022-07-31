@@ -75,18 +75,3 @@ class MixinPublishing:
         x = math.cos(angle) * tmp_x - math.sin(angle) * y
         y = math.cos(angle) * y + math.sin(angle) * tmp_x
         return x, y
-
-    def print_pose(self):
-        print("----------------------------")
-        print("X is : ", str(self.x))
-        print("Y is : ", str(self.y))
-        print("Z is : ", str(self.z))
-        print("Yaw is : ", str(180 / math.pi * self.yaw))
-        print("front : ", self.front)
-
-    def print_vel(self):
-        print("----------------------------")
-        print("x_prime : ", str(self.xprime))
-        print("y_prime : ", str(self.yprime))
-        print("z_prime : ", str(self.zprime))
-        print("yaw_vel = ", str(self.yaw_vel))
