@@ -14,8 +14,8 @@ class MixinPublishing:
         self.pub_vel_global.publish(data)
 
     def set_vel_local(self, xprime=0.0, yprime=0.0, zprime=0.0, yaw_vel=0.0):
-        target_vel = self.transform(Waypoint(xprime, yprime, zprime))
-        self.set_vel_global(target_vel.x, target_vel.y, target_vel.z, yaw_vel)
+        (xprime, yprime) = self.transform(xprime, yprime)
+        self.set_vel_global(xprime, yprime, zprime, yaw_vel)
 
     def move_global_internal(self, x, y, z, yaw):
         data = geometry_msgs.msg.PoseStamped()
@@ -82,6 +82,7 @@ class MixinPublishing:
         print("Y is : ", str(self.y))
         print("Z is : ", str(self.z))
         print("Yaw is : ", str(180 / math.pi * self.yaw))
+        print("front : ", self.front)
 
     def print_vel(self):
         print("----------------------------")

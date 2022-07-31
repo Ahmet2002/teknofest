@@ -4,10 +4,11 @@ from utilities.utils import *
 from utilities.service_handling import MixinServiceHandler
 from utilities.rospyHandler import MixinRosHandler
 from utilities.navigation import MixinNavigation
+from utilities.navigation2 import MixinNavigation2
 from utilities.publishing import MixinPublishing
 from utilities.subscribing import MixinSubscribing
 
-class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinPublishing, MixinSubscribing):
+class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinPublishing, MixinSubscribing, MixinNavigation2):
     def __init__(self):
         self.is_armed = False
         self.current_mode = ""
@@ -27,7 +28,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.prev_front = 0.0
         self.wps = []
         self.front_history = []
-        self.frequency = 10
+        self.frequency = 5
         self.connected = False
         self.is_init = False
 
