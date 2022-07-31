@@ -53,14 +53,18 @@ class MixinPublishing:
         z += self.z
         self.move_global(x, y, z, 180 / math.pi * self.yaw + yaw)
 
-    def is_target_reached(self, x, y, z, yaw, tolerance_lin=0.2, tolerance_ang=0.2):
+    def is_target_reached(self, x, y, z, yaw, check_yaw=True, tolerance_lin=0.2, tolerance_ang=0.2):
         dx = self.x - x
         dy = self.y - y
         dz = self.z - z
-        dyaw = self.yaw - yaw
-        dyaw = abs(math.atan2(math.sin(dyaw), math.cos(dyaw)))
+        
         distance = math.sqrt((math.pow(dx, 2) + math.pow(dy, 2) + math.pow(dz, 2)))
-        if (distance <= tolerance_lin) and (dyaw <= tolerance_ang):
+        if (distance <= tolerance_lin):
+            if check_yaw:
+                dyaw = self.yaw - yaw
+                dyaw = abs(math.atan2(math.sin(dyaw), math.cos(dyaw)))
+                if dyaw > tolerance_ang:
+                    return False
             return True
         return False
 

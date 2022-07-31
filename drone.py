@@ -21,8 +21,9 @@ class MyDroneHandler(DroneHandler):
         time.sleep(3.0)
         # self.move_global(yaw=0.0)
         # self.yazi_yaz(5.0)
-        self.wall.sentence = input("please type a word.")
-        self.run_mission_without_lidar()
+        # self.wall.sentence = input("please type a word.")
+        # self.run_mission_without_lidar()
+        self.run_mission_with_vel()
         
         self.change_mode(MODE_RTL)
         self.disconnect()

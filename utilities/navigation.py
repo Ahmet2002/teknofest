@@ -85,11 +85,13 @@ class MixinNavigation:
             y_vel += y
         else:
             (x, y) = self.transform(x, 0.0)
+            x_vel += x
+            y_vel += y
         return x_vel, y_vel, z_vel, yaw_vel
 
     def move_global_safe(self, x:float, y:float, z:float, vel=0.3):
         config = self.config
-        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z):
+        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, self.yaw):
             d = get_distance(self.x, self.y, self.z, x, y, z)
             (dx, dy, dz) = (x-self.x, y-self.y, z-self.z)
             if d > config.min_distance:
@@ -97,7 +99,20 @@ class MixinNavigation:
             else:
                 (vel_x, vel_y, vel_z) = (dx*config.kp_nav, dy*config.kp_nav, dz*config.kp_nav)
             self.set_controlled_vel_global(x_vel=vel_x, y_vel=vel_y, z_vel=vel_z)
-        self.is_init = False    
+        self.is_init = False
+    
+    def move_global_with_vel(self, x:float, y:float, z:float, yaw=None, vel=0.3):
+        if not yaw:
+            check_yaw = False
+        config = self.config
+        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, self.yaw, check_yaw=False):
+            d = get_distance(self.x, self.y, self.z, x, y, z)
+            (dx, dy, dz) = (x-self.x, y-self.y, z-self.z)
+            if d > config.min_distance:
+                (vel_x, vel_y, vel_z) = (dx*vel/d, dy*vel/d, dz*vel/d)
+            else:
+                (vel_x, vel_y, vel_z) = (dx*config.kp_nav, dy*config.kp_nav, dz*config.kp_nav)
+            self.set_vel_global(vel_x, vel_y, vel_z)
 
     def move_local_safe(self,x=0.0, z=0.0, vel=0.3):
         (x, y) = self.transform(x, 0.0)
@@ -116,18 +131,22 @@ class MixinNavigation:
 
     def go_most_right(self, vel=0.3):
         while self.front < 40.0:
-            self.set_controlled_vel(x_vel=-vel)
+            self.set_controlled_vel(x_vel=vel)
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(x=0.25)
+        while self.front > 40.0:
+            self.set_controlled_vel(x_vel=-0.1)
+            self.rate.sleep()
         self.is_init = False
 
     def go_most_left(self, vel=0.3):
         while self.front < 40.0:
-            self.set_controlled_vel(x_vel=vel)
+            self.set_controlled_vel(x_vel=-vel)
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(x=-0.25)
+        while self.front > 40.0:
+            self.set_controlled_vel(x_vel=0.1)
+            self.rate.sleep()
         self.is_init = False
 
     def go_most_up(self, vel=0.3):
@@ -135,7 +154,9 @@ class MixinNavigation:
             self.set_controlled_vel(z_vel=vel)
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(z=-0.25)
+        while self.front > 40.0:
+            self.set_controlled_vel(z_vel=-0.1)
+            self.rate.sleep()
         self.is_init = False
 
     def go_most_down(self, vel=0.3):
@@ -144,7 +165,9 @@ class MixinNavigation:
             self.set_controlled_vel(z_vel=-vel)
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(z=0.25)
+        while self.front > 40.0:
+            self.set_controlled_vel(z_vel=0.1)
+            self.rate.sleep()
         self.is_init = False
     
     def get_mission(self):
@@ -206,7 +229,13 @@ class MixinNavigation:
                 self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
             self.is_open = False
             self.move_local(x=(box_width - total_width), z=-total_height)
-
+    
+    def run_mission_with_vel(self, vel=0.3):
+        self.wall.sentence = input("Type the sentence.\n")
+        self.get_mission()
+        for wp in self.wps:
+            print("is_open : ", wp.is_open)
+            self.move_global_with_vel(wp.x, wp.y, wp.z, vel=vel)
     def print_path(self):
         if not len(self.wps):
             pass
