@@ -47,7 +47,8 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         
         # Publishers
         self.pub_vel_global = rospy.Publisher("/mavros/setpoint_velocity/cmd_vel_unstamped", geometry_msgs.msg.Twist, queue_size=10)
-        self.pub_pose_global = rospy.Publisher('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped, queue_size=10)
+        self.pub_pose_global = rospy.Publisher("/mavros/setpoint_raw/global", mavros_msgs.msg.GlobalPositionTarget, queue_size=10)
+        self.pub_pose_local = rospy.Publisher('/mavros/setpoint_position/local', geometry_msgs.msg.PoseStamped, queue_size=10)
 
         # Subscribers
         self.sub_pose_global = rospy.Subscriber("/mavros/global_position/local", nav_msgs.msg.Odometry, self.pose_rel_global_cb)

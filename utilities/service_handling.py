@@ -83,6 +83,8 @@ class MixinServiceHandler:
         data = mavros_msgs.srv.WaypointClearRequest()
         self.service_mission_clear.set_data(data)
         result = self.service_caller(self.service_mission_clear, timeout=30)
+        del self.wps
+        self.wps = []
         return result.success
         
     def add_wp_to_wp_list(self,frame,command,is_current,autocontinue,param1,param2,param3,param4,x_lat,y_long,z_alt):

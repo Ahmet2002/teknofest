@@ -20,17 +20,17 @@ class MyDroneHandler(DroneHandler):
         self.takeoff(5.0)
         time.sleep(3.0)
 
-        while True:
-            self.print_pose_global()
-            self.set_vel_local(yprime=1.0)
-            self.rate.sleep()
+        self.move__global_location(-35.36170368, 149.16500413, 50.0)
+
 
         # self.change_mode(MODE_AUTO)
-        # self.clear_wps()
-        # self.add_wp_to_wp_list(3,84,True,True,0.0,0.0,0.0,float('nan'), -35.36326767, 149.16524363, 50)
-        # self.add_wp_to_wp_list(3,16,True,True,0.0,0.0,0.0,float('nan'), -35.36300493, 149.16517528, 50)
+        # print(str(self.clear_wps()))
+        # self.add_wp_to_wp_list(3,22,True,True,0.0,0.0,0.0,float('nan'), -35.36326767, 149.16524363, 50)
+        # self.add_wp_to_wp_list(3,16,True,True,0.0,0.0,0.0,float('nan'), -35.36170368, 149.16500413, 50)
+        # self.add_wp_to_wp_list(3,16,False,True,0.0,0.0,0.0,float('nan'), -35.36232276, 149.16337969, 50)
+        # self.add_wp_to_wp_list(3,20,False,True,0.0,0.0,0.0,float('nan'), -35.36300493, 149.16517528, 50)
         # self.push_wps()
-
+        # self.change_mode(MODE_AUTO)
 
         # self.move_global(yaw=0.0)
         # self.yazi_yaz(5.0)
@@ -38,8 +38,8 @@ class MyDroneHandler(DroneHandler):
         # self.run_mission_without_lidar()
         # self.run_mission_with_vel(vel=0.3)
         
-        # self.change_mode(MODE_RTL)
-        # self.disconnect()
+        self.change_mode(MODE_RTL)
+        self.disconnect()
 
 
 
