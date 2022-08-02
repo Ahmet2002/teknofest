@@ -20,9 +20,8 @@ class MyDroneHandler(DroneHandler):
         self.takeoff(5.0)
         time.sleep(3.0)
 
-        self.move_global(y=40.0)
+        # self.move_global_rel(y=40.0)
         # self.give_global_loc(-35.362690, 149.165104, 50.0)
-        # self.move_global_location(-35.362690, 149.165104, 50.0)
 
 
         # self.change_mode(MODE_AUTO)
@@ -34,10 +33,10 @@ class MyDroneHandler(DroneHandler):
         # self.push_wps()
         # self.change_mode(MODE_AUTO)
 
-        # self.move_global(yaw=0.0)
+        # self.move_global_rel(yaw=0.0)
         # self.yazi_yaz(5.0)
-        # self.wall.sentence = input("please type a word.")
-        # self.run_mission_without_lidar()
+        
+        self.run_mission_without_lidar()
         # self.run_mission_with_vel(vel=0.3)
         
         self.change_mode(MODE_RTL)

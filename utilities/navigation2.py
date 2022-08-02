@@ -106,20 +106,11 @@ class MixinNavigation2:
             self.move_local_safe(x=(box_width - total_width), z=-total_height, vel=vel)
 
     def run_mission_without_lidar(self):
-        config = self.config
-        for c in self.wall.sentence:
-            total_height = 0.0
-            total_width = 0.0
-            wp_list = datas[c]["list"]
-            box_width = datas[c]["width"]
-            for wp in wp_list:
-                rospy.loginfo("writing " + c)
-                total_height += wp.z * config.font_scale
-                total_width += wp.x * config.font_scale
-                self.is_open = wp.is_open
-                self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
-            self.is_open = False
-            self.move_local(x=(box_width - total_width), z=-total_height)
+        self.wall.sentence = input("Type the sentence.\n")
+        self.get_mission()
+        for wp in self.wps:
+            print("is_open : ", wp.is_open)
+            self.move_global_rel(wp.x, wp.y, wp.z)
     
     def run_mission_with_vel(self, vel=0.3):
         self.wall.sentence = input("Type the sentence.\n")
