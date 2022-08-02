@@ -18,17 +18,7 @@ class MixinPublishing:
         (xprime, yprime) = self.transform(xprime, yprime)
         self.set_vel_global(xprime, yprime, zprime, yaw_vel)
 
-    def move_global_internal(self, x, y, z, yaw):
-        data = geometry_msgs.msg.PoseStamped()
-        data.header.stamp = rospy.Time.now()
-        data.pose.position.x = x
-        data.pose.position.y = y
-        data.pose.position.z = z
-        (data.pose.orientation.x,data.pose.orientation.y,data.pose.orientation.z,
-        data.pose.orientation.w) = get_quaternion_from_euler(self.roll, self.pitch, yaw)
-        self.pub_pose_local.publish(data)
-
-    def move_global(self, x=None, y=None , z=None, yaw=None):
+    def move_global_rel(self, x=None, y=None , z=None, yaw=None):
         if x == None:
             x = self.x
         if y == None:
@@ -39,9 +29,16 @@ class MixinPublishing:
             yaw = self.yaw
         else:
             yaw = angle2radian(yaw)
+        data = geometry_msgs.msg.PoseStamped()
+        data.header.stamp = rospy.Time.now()
+        data.pose.position.x = x
+        data.pose.position.y = y
+        data.pose.position.z = z
+        (data.pose.orientation.x,data.pose.orientation.y,data.pose.orientation.z,
+        data.pose.orientation.w) = get_quaternion_from_euler(self.roll, self.pitch, yaw)
+        self.pub_pose_local.publish(data)
+
         while not rospy.is_shutdown():
-            self.move_global_internal(x, y, z, yaw)
-            self.print_vel()
             self.print_pose()
             if self.is_target_reached(x, y, z, yaw):
                 break
@@ -52,7 +49,7 @@ class MixinPublishing:
         x += self.x
         y += self.y
         z += self.z
-        self.move_global(x, y, z, 180 / math.pi * self.yaw + yaw)
+        self.move_global_rel(x, y, z, 180 / math.pi * self.yaw + yaw)
 
     def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.2, tolerance_ang=0.2, is_global=False):
         if not is_global:
@@ -63,7 +60,8 @@ class MixinPublishing:
         
         else:
             check_yaw = False
-            distance = self.iki_nokta_arasi_uzaklik_hesaplama_3d((x, y, z + 603,318633815), (self.latitude, self.longitude, self.altitude))
+            distance = self.iki_nokta_arasi_uzaklik_hesaplama_3d((x, y, z + self.home[2]), (self.latitude, self.longitude, self.altitude))
+        print("distance : ", distance)
 
         if (distance <= tolerance_lin):
             if check_yaw:
@@ -91,10 +89,14 @@ class MixinPublishing:
         data.coordinate_frame = data.FRAME_GLOBAL_REL_ALT
         data.header.stamp = rospy.Time.now()
         self.pub_pose_global.publish(data)
+        while not rospy.is_shutdown():
+            self.print_pose_global()
+            if self.is_target_reached(lat, lon, alt, is_global=True):
+                break
+            self.rate.sleep()
 
     @staticmethod
     def iki_nokta_arasi_uzaklik_hesaplama_2d(coord_1,coord_2):
-
         distance_2d = distance.distance(coord_1[:2], coord_2[:2]).m
         #print("2D - " +str(distance_2d))
         return distance_2d
@@ -103,14 +105,6 @@ class MixinPublishing:
         distance_3d = np.sqrt(self.iki_nokta_arasi_uzaklik_hesaplama_2d(coord_1,coord_2)**2 + (coord_1[2] - coord_2[2])**2)
         #print("3D - "+str(distance_3d))
         return distance_3d
-
-    def move__global_location(self, lat, lon, alt):
-        while not rospy.is_shutdown():
-            self.print_pose_global()
-            if self.is_target_reached(lat, lon, alt, is_global=True):
-                break
-            self.give_global_loc(lat, lon, alt)
-            self.rate.sleep()
 
 class Waypoints():
 	def __init__(self):

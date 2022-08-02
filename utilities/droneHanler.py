@@ -12,6 +12,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
     def __init__(self):
         self.is_armed = False
         self.current_mode = ""
+        self.home = [0.0, 0.0, 0.0]
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -31,7 +32,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.prev_front = 0.0
         self.wps = []
         self.front_history = []
-        self.frequency = 5
+        self.frequency = 2
         self.connected = False
         self.is_init = False
 
@@ -56,3 +57,4 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.sub_vel_global = rospy.Subscriber("/mavros/local_position/velocity_body", geometry_msgs.msg.TwistStamped, self.vel_global_cb)
         self.sub_state = rospy.Subscriber("/mavros/state", mavros_msgs.msg.State, self.state_cb)
         self.sub_lidar = rospy.Subscriber("/spur/laser/scan", sensor_msgs.msg.LaserScan, self.lidar_cb)
+        self.sub_home_pose = rospy.Subscriber("/mavros/home_position/home", mavros_msgs.msg.HomePosition, self.home_pose_cb)

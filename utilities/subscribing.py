@@ -3,6 +3,11 @@ from utilities.utils import *
 
 
 class MixinSubscribing:
+    def home_pose_cb(self, data):
+        self.home[0] = data.geo.latitude
+        self.home[1] = data.geo.longitude
+        self.home[2] = data.geo.altitude
+
     def pose_rel_global_cb(self, data):
         self.x = data.pose.pose.position.x
         self.y = data.pose.pose.position.y
