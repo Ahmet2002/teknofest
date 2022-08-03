@@ -6,31 +6,24 @@ class MixinNavigation2:
         vel = 0.0
         count = 0
         self.is_init = False
-        while True:
-            time.sleep(0.5)
+        while not rospy.is_shutdown():
             self.print_pose()
-            if self.front > 40.0:
-                self.is_init = False
-                vel = self.config.max_yaw_vel
-            elif not self.is_init:
-                self.prev_front = self.front
-                vel=0.1
-                self.is_init = True
+            if (self.left > 40.0) or (self.right > 40.0):
+                if self.right <= 40.0:
+                    vel = -self.config.max_yaw_vel
+                else:
+                    vel = self.config.max_yaw_vel
             else:
-                vel = self.config.kp_yaw * (self.prev_front - self.front) / self.prev_front
-                self.prev_front = self.front
-                if abs(vel) < 0.005:
-                    count += 1
-                if count > 1:
-                    self.set_vel_global(yaw_vel=0.0)
+                vel = self.config.kp_yaw * (self.right - self.left) / self.left
+                if abs(vel) < 0.01:
                     break
                 if self.config.max_yaw_vel < vel:
                     vel = self.config.max_yaw_vel
                 elif -self.config.max_yaw_vel > vel:
                     vel = -self.config.max_yaw_vel
             self.set_vel_global(yaw_vel=vel)
+            self.rate.sleep()
         self.move_local(y=(self.front - distance))
-        self.is_init = False
     
     def init_wall(self, wall:Wall, distance=5.0):
         self.duvara_bak(distance=distance)
@@ -117,14 +110,6 @@ class MixinNavigation2:
             print("is_open : ", wp.is_open)
             self.move_global(wp.x, wp.y, wp.z)
             time.sleep(0.2)
-    
-    def run_mission_with_vel(self, vel=0.3):
-        self.wall.sentence = input("Type the sentence.\n")
-        self.get_mission()
-        for wp in self.wps:
-            print("is_open : ", wp.is_open)
-            self.move_global_with_vel(wp.x, wp.y, wp.z, vel=vel)
-            time.sleep(0.3)
 
     def print_path(self):
         if not len(self.wps):

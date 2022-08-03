@@ -32,11 +32,11 @@ class MyDroneHandler(DroneHandler):
         # self.change_mode(MODE_AUTO)
 
         # self.move_global_rel(yaw=0.0)
-        # self.yazi_yaz(5.0)
+        self.yazi_yaz(5.0)
         
-        self.move_global_rel(yaw=180.0)
-        self.print_pose()
-        self.run_mission_without_lidar()
+        # self.move_global_rel(yaw=180.0)
+        # self.print_pose()
+        # self.run_mission_without_lidar()
         # self.run_mission_with_vel(vel=0.3)
         
         self.change_mode(MODE_RTL)

@@ -37,7 +37,10 @@ class MixinSubscribing:
         self.is_armed = data.armed
 
     def lidar_cb(self, data):
-        self.front = data.ranges[int(math.pi / data.angle_increment)]
+        angle = angle2radian(5.0)
+        self.right = data.ranges[int((math.pi - angle) / data.angle_increment)]
+        self.left = data.ranges[int((math.pi + angle) / data.angle_increment)]
+
 
     def print_pose(self):
         print("----------------------------")
@@ -45,9 +48,10 @@ class MixinSubscribing:
         print("Y is : ", str(self.y))
         print("Z is : ", str(self.z))
         print("Yaw is : ", str(180 / math.pi * self.yaw))
-        print("front : ", self.front)
+        print("front : ", self.get_front())
 
     def print_pose_global(self):
+        print("------------------------------")
         print("latitude : ", self.latitude)
         print("longitude : ", self.longitude)
         print("altitude : ", self.altitude)
