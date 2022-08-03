@@ -18,10 +18,8 @@ class MyDroneHandler(DroneHandler):
             time.sleep(1)
 
         self.takeoff(5.0)
-        time.sleep(3.0)
+        time.sleep(1.0)
 
-        # self.move_global_rel(y=40.0)
-        # self.give_global_loc(-35.362690, 149.165104, 50.0)
 
 
         # self.change_mode(MODE_AUTO)
@@ -36,6 +34,8 @@ class MyDroneHandler(DroneHandler):
         # self.move_global_rel(yaw=0.0)
         # self.yazi_yaz(5.0)
         
+        self.move_global_rel(yaw=180.0)
+        self.print_pose()
         self.run_mission_without_lidar()
         # self.run_mission_with_vel(vel=0.3)
         

@@ -46,21 +46,20 @@ class MixinPublishing:
 
     def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0):
         (x, y) = self.transform(x, y)
-        x += self.x
-        y += self.y
-        z += self.z
-        self.move_global_rel(x, y, z, 180 / math.pi * self.yaw + yaw)
+        lat = self.latitude + (180.0/math.pi)*(y/6378137)
+        lon = self.longitude + (180.0/math.pi)*(x/6378137)/math.cos(math.pi/180.0*self.latitude)
+        alt = self.altitude - self.home[2] + z
+        self.move_global(lat, lon, alt, yaw=(self.yaw + angle2radian(yaw)))
 
-    def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.2, tolerance_ang=0.2, is_global=False):
+    def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.3, tolerance_ang=0.2, is_global=False):
         if not is_global:
             dx = self.x - x
             dy = self.y - y
             dz = self.z - z
-            distance = math.sqrt((math.pow(dx, 2) + math.pow(dy, 2) + math.pow(dz, 2)))
-        
+            distance = get_distance(self.x, self.y, self.z, x, y, z)
         else:
-            check_yaw = False
             distance = self.iki_nokta_arasi_uzaklik_hesaplama_3d((x, y, z + self.home[2]), (self.latitude, self.longitude, self.altitude))
+        
         print("distance : ", distance)
 
         if (distance <= tolerance_lin):
@@ -80,18 +79,24 @@ class MixinPublishing:
         y = math.cos(angle) * y + math.sin(angle) * tmp_x
         return x, y
 
-    def give_global_loc(self, lat:float, lon:float, alt:float):
+    def move_global(self, lat=None, lon=None, alt=None, yaw=None):
         data = mavros_msgs.msg.GlobalPositionTarget()
         data.latitude = lat
         data.longitude = lon
         data.altitude = alt
-        data.type_mask = data.IGNORE_YAW + data.IGNORE_AFX + data.IGNORE_AFY + data.IGNORE_AFZ + data.IGNORE_VX + data.IGNORE_VY + data.IGNORE_VZ + data.IGNORE_YAW_RATE
+        data.type_mask = data.IGNORE_AFX + data.IGNORE_AFY + data.IGNORE_AFZ + data.IGNORE_VX + data.IGNORE_VY + data.IGNORE_VZ + data.IGNORE_YAW_RATE
         data.coordinate_frame = data.FRAME_GLOBAL_REL_ALT
+        if yaw == None:
+            data.type_mask += data.IGNORE_YAW
+            check_yaw = False
+        else:
+            data.yaw = yaw
+            check_yaw = True
         data.header.stamp = rospy.Time.now()
         self.pub_pose_global.publish(data)
         while not rospy.is_shutdown():
             self.print_pose_global()
-            if self.is_target_reached(lat, lon, alt, is_global=True):
+            if self.is_target_reached(lat, lon, alt, yaw=yaw, is_global=True, check_yaw=check_yaw):
                 break
             self.rate.sleep()
 
@@ -106,22 +111,22 @@ class MixinPublishing:
         #print("3D - "+str(distance_3d))
         return distance_3d
 
-class Waypoints():
-	def __init__(self):
-		self.x_global = self.latitude
-		self.y_global = self.longitude
-		self.z_global = self.altitude
-		self.yawRate = (180 / math.pi * self.yaw) + 90
-		self.fontSize = 0.0
+# class Waypoints():
+# 	def __init__(self):
+# 		self.x_global = self.latitude
+# 		self.y_global = self.longitude
+# 		self.z_global = self.altitude
+# 		self.yawRate = (180 / math.pi * self.yaw) + 90
+# 		self.fontSize = 0.0
 
-	def wpCreater(self, fontSize):
-		for letter in self.wall.sentence:
-			if letter == "T":
-				wp_T = []
-				current_wp = [self.x_global,self.y_global,self.z_global]
-				wp_T.append(current_wp)
-				wp1 = newLoactionCal(current_wp, fontSize, self.yawRate)
-				wp_T.append(tuple(wp1))
-				wp2 = newLoactionCal(current_wp, (-fontSize/2), self.yawRate)
-				wp_T.append(tuple(wp2))
-				wp3 = wp2.copy()
+# 	def wpCreater(self, fontSize):
+# 		for letter in self.wall.sentence:
+# 			if letter == "T":
+# 				wp_T = []
+# 				current_wp = [self.x_global,self.y_global,self.z_global]
+# 				wp_T.append(current_wp)
+# 				wp1 = distance.newLoactionCal(current_wp, fontSize, self.yawRate)
+# 				wp_T.append(tuple(wp1))
+# 				wp2 = newLoactionCal(current_wp, (-fontSize/2), self.yawRate)
+# 				wp_T.append(tuple(wp2))
+# 				wp3 = wp2.copy()
