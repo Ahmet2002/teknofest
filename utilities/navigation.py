@@ -14,9 +14,9 @@ class MixinNavigation:
         else:
             yaw_vel = self.config.kp_yaw * (self.right - self.left) / self.left
             if self.config.max_yaw_vel < yaw_vel:
-                yaw_vel = self.config.max_yaw_vel
+                yaw_vel = config.max_yaw_vel
             elif -self.config.max_yaw_vel > yaw_vel:
-                yaw_vel = -self.config.max_yaw_vel
+                yaw_vel = -config.max_yaw_vel
         
         # Compute front_vel to adjust the distance to wall
         y_vel = (self.get_front() - config.distance) * config.kp_nav
@@ -71,7 +71,7 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(x=-0.5)
-        self.duvara_bak()
+        self.duvara_bak(self.config.distance)
 
     def go_most_left(self, vel=0.3):
         while not rospy.is_shutdown():
@@ -81,7 +81,7 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(x=0.5)
-        self.duvara_bak()
+        self.duvara_bak(self.config.distance)
 
     def go_most_up(self, vel=0.3):
         while not rospy.is_shutdown():
@@ -91,7 +91,7 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(z=-0.5)
-        self.duvara_bak()
+        self.duvara_bak(self.config.distance)
 
     def go_most_down(self, vel=0.3):
         while not rospy.is_shutdown():
@@ -101,4 +101,4 @@ class MixinNavigation:
             self.rate.sleep()
         self.set_vel_global()
         self.move_local(z=0.5)
-        self.duvara_bak()
+        self.duvara_bak(self.config.distance)

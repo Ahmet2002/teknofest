@@ -5,7 +5,6 @@ class MixinNavigation2:
         self.config.distance = distance
         vel = 0.0
         count = 0
-        self.is_init = False
         while not rospy.is_shutdown():
             self.print_pose()
             if (self.left > 40.0) or (self.right > 40.0):
@@ -23,24 +22,7 @@ class MixinNavigation2:
                     vel = -self.config.max_yaw_vel
             self.set_vel_global(yaw_vel=vel)
             self.rate.sleep()
-        self.move_local(y=(self.front - distance))
-    
-    def init_wall(self, wall:Wall, distance=5.0):
-        self.duvara_bak(distance=distance)
-        self.go_most_down()
-        print("bitti")
-        self.go_most_right()
-        print("bitti")
-        (x1, y1, z1) = (self.x, self.y, self.z)
-        self.go_most_up()
-        print("bitti")
-        self.go_most_left()
-        print("bitti")
-        (x2, y2, z2) = (self.x, self.y, self.z)
-        wall.height = z2 - z1
-        wall.width = get_distance(x1, y1, z1, x2, y2, z2)
-        wall.angle = math.atan2(y1 - y2, x1 - x2)
-        wall.is_init = True
+        self.move_local(y=(self.get_front() - distance))
 
     def go_2d_on_wall(self, x=0.0, y=0.0):
         wall = self.wall
@@ -116,10 +98,17 @@ class MixinNavigation2:
             pass
         for wp in self.wps:
             print("({}, {}, {})".format(wp.x, wp.y, wp.z))
+
+    def init_wall(self, distance=5.0):
+        self.duvara_bak(distance=distance)
+        self.go_most_up()
+        print("bitti")
+        self.go_most_left()
+        print("bitti")
     
     def yazi_yaz(self, distance_to_wall):
-        self.init_wall(self.wall, distance_to_wall)
+        # self.init_wall(distance_to_wall)
+        self.duvara_bak(distance=distance_to_wall)
         self.wall.sentence = input("Please enter the sentence to be painted on the wall\n")
         self.run_mission()
         rospy.logdebug("mission completed !")
-        self.wall.is_init = False
