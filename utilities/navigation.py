@@ -70,7 +70,8 @@ class MixinNavigation:
                 break
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(x=-1.0)
+        self.move_local(x=-0.5)
+        self.duvara_bak()
 
     def go_most_left(self, vel=0.3):
         while not rospy.is_shutdown():
@@ -79,7 +80,8 @@ class MixinNavigation:
                 break
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(x=1.0)
+        self.move_local(x=0.5)
+        self.duvara_bak()
 
     def go_most_up(self, vel=0.3):
         while not rospy.is_shutdown():
@@ -88,7 +90,8 @@ class MixinNavigation:
                 break
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(z=-1.0)
+        self.move_local(z=-0.5)
+        self.duvara_bak()
 
     def go_most_down(self, vel=0.3):
         while not rospy.is_shutdown():
@@ -97,4 +100,5 @@ class MixinNavigation:
                 break
             self.rate.sleep()
         self.set_vel_global()
-        self.move_local(z=1.0)
+        self.move_local(z=0.5)
+        self.duvara_bak()

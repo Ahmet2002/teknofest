@@ -108,7 +108,7 @@ class MixinNavigation2:
         for wp in self.wps:
             self.is_open = wp.is_open
             print("is_open : ", wp.is_open)
-            self.move_global(wp.x, wp.y, wp.z)
+            self.move_global(wp.x, wp.y, wp.z, self.yaw)
             time.sleep(0.2)
 
     def print_path(self):

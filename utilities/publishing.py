@@ -62,7 +62,7 @@ class MixinPublishing:
         
         print("distance : ", distance)
 
-        if (distance <= tolerance_lin):
+        if (distance < tolerance_lin):
             if check_yaw:
                 dyaw = self.yaw - yaw
                 dyaw = abs(math.atan2(math.sin(dyaw), math.cos(dyaw)))
