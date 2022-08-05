@@ -33,7 +33,7 @@ class MixinNavigation:
 
     def move_global_safe(self, x:float, y:float, z:float, vel=0.3):
         config = self.config
-        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, self.yaw):
+        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, check_yaw=False):
             self.print_pose()
             d = get_distance(self.x, self.y, self.z, x, y, z)
             (dx, dy, dz) = (x-self.x, y-self.y, z-self.z)
@@ -42,6 +42,34 @@ class MixinNavigation:
             else:
                 (vel_x, vel_y, vel_z) = (dx*config.kp_nav, dy*config.kp_nav, dz*config.kp_nav)
             self.set_controlled_vel_global(x_vel=vel_x, y_vel=vel_y, z_vel=vel_z)
+            self.rate.sleep()
+        
+    def move_global_safe_deneme(self, x:float, y:float, z:float, vel=0.3):
+        config = self.config
+        pid_x = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=x, sample_time=0.1)
+        pid_y = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=y, sample_time=0.1)
+        pid_z = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=z, sample_time=0.1)
+        pid_yaw = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=0.0, sample_time=0.1)
+        pid_front = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=config.distance, sample_time=0.1)
+        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, check_yaw=False):
+            self.print_pose()
+            (dx, dy, dz) = (x-self.x, y-self.y, z-self.z)
+            (vel_x, vel_y, vel_z) = (pid_x(dx), pid_y(dy), pid_z(dz))
+
+            # Compute yaw vel
+            if (self.left > 40.0) or (self.right > 40.0):
+                rospy.logerr("out of wall !")
+                self.disconnect()
+            else:
+                yaw_vel = pid_yaw(self.right - self.left)
+            
+            # Compute front_vel to adjust the distance to wall
+            y_vel = pid_front(self.get_front())
+            (x_vel, y_vel) = self.transform(0.0, y_vel)
+            z_vel = vel_z
+            x_vel += vel_x
+            y_vel += vel_y
+            self.set_vel_global(x_vel, y_vel, z_vel, yaw_vel)
             self.rate.sleep()
 
     def move_local_safe(self,x=0.0, z=0.0, vel=0.3):

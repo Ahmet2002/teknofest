@@ -127,6 +127,7 @@ class Config:
 		self.min_distance = 0.5
 		self.max_yaw_vel = 0.3
 		self.font_scale = 1.0
+		self.distance = 5.0
 
 class Wall:
 	def __init__(self):

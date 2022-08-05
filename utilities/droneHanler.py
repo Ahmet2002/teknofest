@@ -28,12 +28,9 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.yaw_vel = 0.0
         self.config = Config()
         self.wall = Wall()
-        self.front = 0.0
         self.left = 0.0
         self.right = 0.0
-        self.prev_front = 0.0
         self.wps = []
-        self.front_history = []
         self.frequency = 10
         self.connected = False
         self.sim_mode = True
