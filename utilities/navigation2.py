@@ -26,7 +26,7 @@ class MixinNavigation2:
 
     def duvara_bak_deneme(self, distance=0.5):
         pid_yaw = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=0.0, sample_time=0.1)
-        pid.output_limits = (-0.3, 0.3)
+        pid_yaw.output_limits = (-0.3, 0.3)
         self.config.distance = distance
         diff = 0.0
         control = 0.0
@@ -34,14 +34,14 @@ class MixinNavigation2:
             self.print_pose()
             if (self.left > 40.0) or (self.right > 40.0):
                 if self.right <= 40.0:
-                    vel = -self.config.max_yaw_vel
+                    control = -self.config.max_yaw_vel
                 else:
-                    vel = self.config.max_yaw_vel
+                    control = self.config.max_yaw_vel
             else:
                 diff = self.left - self.right
-                if abs(diff) < 0.01:
+                if abs(diff) < 0.001:
                     break
-                control = pid(diff)
+                control = pid_yaw(diff)
             self.set_vel_global(yaw_vel=control)
             self.rate.sleep()
         self.move_local(y=(self.get_front() - distance))

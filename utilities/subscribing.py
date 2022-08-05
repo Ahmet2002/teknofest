@@ -36,7 +36,7 @@ class MixinSubscribing:
         self.current_mode = data.mode
         self.is_armed = data.armed
 
-    def lidar_cb(self, data):
+    def lidar_sim_cb(self, data):
         angle = angle2radian(5.0)
         self.right = data.ranges[int((math.pi - angle) / data.angle_increment)]
         self.left = data.ranges[int((math.pi + angle) / data.angle_increment)]
