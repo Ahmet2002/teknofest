@@ -34,7 +34,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.prev_front = 0.0
         self.wps = []
         self.front_history = []
-        self.frequency = 2
+        self.frequency = 10
         self.connected = False
 
         # Services

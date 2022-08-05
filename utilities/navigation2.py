@@ -1,10 +1,10 @@
 from utilities.utils import *
+from simple_pid import PID
 
 class MixinNavigation2:
     def duvara_bak(self, distance=5.0):
         self.config.distance = distance
         vel = 0.0
-        count = 0
         while not rospy.is_shutdown():
             self.print_pose()
             if (self.left > 40.0) or (self.right > 40.0):
@@ -21,6 +21,28 @@ class MixinNavigation2:
                 elif -self.config.max_yaw_vel > vel:
                     vel = -self.config.max_yaw_vel
             self.set_vel_global(yaw_vel=vel)
+            self.rate.sleep()
+        self.move_local(y=(self.get_front() - distance))
+
+    def duvara_bak_deneme(self, distance=0.5):
+        pid_yaw = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=0.0, sample_time=0.1)
+        pid.output_limits = (-0.3, 0.3)
+        self.config.distance = distance
+        diff = 0.0
+        control = 0.0
+        while not rospy.is_shutdown():
+            self.print_pose()
+            if (self.left > 40.0) or (self.right > 40.0):
+                if self.right <= 40.0:
+                    vel = -self.config.max_yaw_vel
+                else:
+                    vel = self.config.max_yaw_vel
+            else:
+                diff = self.left - self.right
+                if abs(diff) < 0.01:
+                    break
+                control = pid(diff)
+            self.set_vel_global(yaw_vel=control)
             self.rate.sleep()
         self.move_local(y=(self.get_front() - distance))
 
