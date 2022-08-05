@@ -40,7 +40,12 @@ class MixinSubscribing:
         angle = angle2radian(5.0)
         self.right = data.ranges[int((math.pi - angle) / data.angle_increment)]
         self.left = data.ranges[int((math.pi + angle) / data.angle_increment)]
-
+    
+    def left_range_cb(self, data):
+        self.left = data.range
+    
+    def right_range_cb(self, data):
+        self.right = data.range
 
     def print_pose(self):
         print("----------------------------")
