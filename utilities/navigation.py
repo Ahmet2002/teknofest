@@ -1,5 +1,6 @@
 from rospy import is_shutdown
 from utilities.utils import *
+from simple_pid import PID
 
 class MixinNavigation:
     def get_front(self):
@@ -44,38 +45,49 @@ class MixinNavigation:
             self.set_controlled_vel_global(x_vel=vel_x, y_vel=vel_y, z_vel=vel_z)
             self.rate.sleep()
         
-    def move_global_safe_deneme(self, x:float, y:float, z:float, vel=0.3):
+    def move_global_safe_deneme(self, x:float, y:float, z:float):
         config = self.config
-        pid_x = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=x, sample_time=0.1)
-        pid_y = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=y, sample_time=0.1)
-        pid_z = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=z, sample_time=0.1)
-        pid_yaw = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=0.0, sample_time=0.1)
-        pid_front = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=config.distance, sample_time=0.1)
+        pid_x = PID(Kp=0.5, Ki=0.3, Kd=0.4, setpoint=x, sample_time=0.1)
+        pid_y = PID(Kp=0.5, Ki=0.3, Kd=0.4, setpoint=y, sample_time=0.1)
+        pid_z = PID(Kp=0.5, Ki=0.3, Kd=0.4, setpoint=z, sample_time=0.1)
+        pid_yaw = PID(Kp=0.5, Ki=0.0, Kd=1.0, setpoint=0.0, sample_time=0.1)
+        pid_front = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=config.distance, sample_time=0.1)
+        pid_x.output_limits = (-0.3, 0.3)
+        pid_y.output_limits = (-0.3, 0.3)
+        pid_z.output_limits = (-0.3, 0.3)
+        pid_yaw.output_limits = (-0.3, 0.3)
+        pid_front.output_limits = (-0.3, 0.3)
         while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, check_yaw=False):
+            print("target_x : ", x)
+            print("target_y : ", y)
+            print("target_z : ", z)
             self.print_pose()
-            (dx, dy, dz) = (x-self.x, y-self.y, z-self.z)
-            (vel_x, vel_y, vel_z) = (pid_x(dx), pid_y(dy), pid_z(dz))
+            (vel_x, vel_y, vel_z) = (pid_x(self.x), pid_y(self.y), pid_z(self.z))
 
             # Compute yaw vel
             if (self.left > 40.0) or (self.right > 40.0):
                 rospy.logerr("out of wall !")
                 self.disconnect()
             else:
-                yaw_vel = pid_yaw(self.right - self.left)
+                yaw_vel = pid_yaw(self.left - self.right)
             
             # Compute front_vel to adjust the distance to wall
             y_vel = pid_front(self.get_front())
             (x_vel, y_vel) = self.transform(0.0, y_vel)
-            z_vel = vel_z
             x_vel += vel_x
             y_vel += vel_y
-            self.set_vel_global(x_vel, y_vel, z_vel, yaw_vel)
+            self.set_vel_global(x_vel, y_vel, vel_z, yaw_vel)
             self.rate.sleep()
 
     def move_local_safe(self,x=0.0, z=0.0, vel=0.3):
         (x, y) = self.transform(x, 0.0)
         (x, y, z) = (x + self.x, y + self.y, z + self.z)
-        self.move_global_safe(x, y, z, vel=vel)
+        self.move_global_safe(x, y, z)
+
+    def move_local_safe_deneme(self,x=0.0, z=0.0):
+        (x, y) = self.transform(x, 0.0)
+        (x, y, z) = (x + self.x, y + self.y, z + self.z)
+        self.move_global_safe_deneme(x, y, z)
 
     def set_controlled_vel(self, x_vel=0.0, z_vel=0.0):
         (x_vel, y_vel, z_vel, yaw_vel) = self.combine_vels(x=x_vel, z=z_vel, is_global=False)

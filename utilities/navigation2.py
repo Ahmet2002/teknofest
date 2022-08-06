@@ -25,26 +25,28 @@ class MixinNavigation2:
         # self.move_local(y=(self.get_front() - distance))
 
     def duvara_bak_deneme(self, distance=0.5):
-        pid_yaw = PID(Kp=0.5, Ki=0.2, Kd=0.2, setpoint=0.0, sample_time=0.1)
-        pid_yaw.output_limits = (-0.3, 0.3)
+        pid_yaw = PID(Kp=0.5, Ki=0.2, Kd=1.0, setpoint=0.0, sample_time=0.1)
+        pid_yaw.output_limits = (-0.2, 0.2)
         self.config.distance = distance
         diff = 0.0
         control = 0.0
         while not rospy.is_shutdown():
             self.print_pose()
             if (self.left > 40.0) or (self.right > 40.0):
+                print()
                 if self.right <= 40.0:
                     control = -self.config.max_yaw_vel
                 else:
                     control = self.config.max_yaw_vel
             else:
+                print("diff : ", diff)
                 diff = self.left - self.right
                 if abs(diff) < 0.001:
                     break
                 control = pid_yaw(diff)
             self.set_vel_global(yaw_vel=control)
             self.rate.sleep()
-        # self.move_local(y=(self.get_front() - distance))
+        self.move_local(y=(self.get_front() - distance))
 
     def go_2d_on_wall(self, x=0.0, y=0.0):
         wall = self.wall
@@ -102,9 +104,11 @@ class MixinNavigation2:
                 total_height += wp.z * config.font_scale
                 total_width += wp.x * config.font_scale
                 self.is_open = wp.is_open
-                self.move_local_safe(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale), vel=vel)
+                # self.move_local_safe(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale), vel=vel)
+                self.move_local_safe_deneme(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
             self.is_open = False
-            self.move_local_safe(x=(box_width - total_width), z=-total_height, vel=vel)
+            # self.move_local_safe(x=(box_width - total_width), z=-total_height, vel=vel)
+            self.move_local_safe_deneme(x=(box_width - total_width), z=-total_height)
 
     def run_mission_without_lidar(self):
         self.wall.sentence = input("Type the sentence.\n")

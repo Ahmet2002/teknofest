@@ -53,9 +53,6 @@ class MixinPublishing:
 
     def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.3, tolerance_ang=0.2, is_global=False):
         if not is_global:
-            dx = self.x - x
-            dy = self.y - y
-            dz = self.z - z
             distance = get_distance(self.x, self.y, self.z, x, y, z)
         else:
             distance = self.iki_nokta_arasi_uzaklik_hesaplama_3d((x, y, z + self.home[2]), (self.latitude, self.longitude, self.altitude))
