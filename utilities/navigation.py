@@ -26,14 +26,40 @@ class MixinNavigation:
             # Compute yaw vel
             if (self.left > 40.0) or (self.right > 40.0):
                 rospy.logerr("out of wall !")
-                self.disconnect()
+                return False
             else:
                 yaw_vel = pid_yaw(self.left - self.right)
             
             self.set_vel_global(vel_x, vel_y, vel_z, yaw_vel)
             self.rate.sleep()
+        
+        return True
 
     def move_local_safe(self,x=0.0, y=0.0, z=0.0):
         (x, y) = self.transform(x, y)
         (x, y, z) = (x + self.x, y + self.y, z + self.z)
         self.move_global_safe(x, y, z)
+
+    def go_most_left(self):
+        while not rospy.is_shutdown():
+            if self.move_local_safe(x=-1.0):
+                break
+        self.move_local(x=1.0)
+    
+    def go_most_right(self):
+        while not rospy.is_shutdown():
+            if self.move_local_safe(x=1.0):
+                break
+        self.move_local(x=-1.0)
+
+    def go_most_up(self):
+        while not rospy.is_shutdown():
+            if self.move_local_safe(z=1.0):
+                break
+        self.move_local(z=-1.0)
+
+    def go_most_down(self):
+        while not rospy.is_shutdown():
+            if self.move_local_safe(z=-1.0):
+                break
+        self.move_local(z=1.0)

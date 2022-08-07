@@ -25,9 +25,9 @@ class MyDroneHandler(DroneHandler):
         self.duvara_bak(distance=2.0)
         self.print_pose()
         print("a"*100)
-        # self.move_local_safe_deneme(x=3.0)
-        self.wall.sentence = input("Type the sentence.\n")
-        self.run_mission()
+        self.go_most_up()
+        # self.wall.sentence = input("Type the sentence.\n")
+        # self.run_mission()
 
         # self.change_mode(MODE_AUTO)
         # print(str(self.clear_wps()))
