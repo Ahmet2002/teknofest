@@ -104,9 +104,9 @@ class MixinNavigation2:
     def init_wall(self, distance=5.0):
         self.duvara_bak(distance=distance)
         self.go_most_up()
-        print("bitti")
+        print("en yukarıya gitti")
         self.go_most_left()
-        print("bitti")
+        print("En sola gitti")
     
     def yazi_yaz(self, distance_to_wall):
         # self.init_wall(distance_to_wall)
