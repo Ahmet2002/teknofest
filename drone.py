@@ -21,12 +21,8 @@ class MyDroneHandler(DroneHandler):
         time.sleep(2.0)
 
 
-        # self.move_local(y=5.0)
-        # self.move_local(x=5.0)
-        # self.move_local(y=-5.0)
-        # self.move_local(x=-5.0)
         # self.move_global_rel(yaw=0.0)
-        self.duvara_bak_deneme(distance=5.0)
+        self.duvara_bak(distance=2.0)
         self.print_pose()
         print("a"*100)
         # self.move_local_safe_deneme(x=3.0)
@@ -40,14 +36,6 @@ class MyDroneHandler(DroneHandler):
         # self.add_wp_to_wp_list(3,16,False,True,0.0,0.0,0.0,float('nan'), -35.36232276, 149.16337969, 50)
         # self.add_wp_to_wp_list(3,20,False,True,0.0,0.0,0.0,float('nan'), -35.36300493, 149.16517528, 50)
         # self.push_wps()
-        # self.change_mode(MODE_AUTO)
-
-        # self.move_global_rel(yaw=0.0)
-        # self.yazi_yaz(5.0)
-        
-        # self.move_global_rel(yaw=180.0)
-        # self.print_pose()
-        # self.run_mission_without_lidar()
         
         # self.land()
         self.change_mode(MODE_RTL)
