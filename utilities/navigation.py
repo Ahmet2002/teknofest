@@ -4,7 +4,7 @@ from simple_pid import PID
 
 class MixinNavigation:
     def get_front(self):
-        return (self.right * math.cos(angle2radian(5.0)))
+        return (self.right * math.cos(self.angle_offset))
         
     def move_global_safe(self, x:float, y:float, z:float, vel=0.15):
         config = self.config
@@ -38,28 +38,30 @@ class MixinNavigation:
     def move_local_safe(self,x=0.0, y=0.0, z=0.0):
         (x, y) = self.transform(x, y)
         (x, y, z) = (x + self.x, y + self.y, z + self.z)
-        self.move_global_safe(x, y, z)
+        if self.move_global_safe(x, y, z):
+            return True
+        return False
 
     def go_most_left(self):
         while not rospy.is_shutdown():
-            if self.move_local_safe(x=-1.0):
+            if not self.move_local_safe(x=-1.0):
                 break
-        self.move_local(x=1.0)
+        self.move_local(x=1.5)
     
     def go_most_right(self):
         while not rospy.is_shutdown():
-            if self.move_local_safe(x=1.0):
+            if not self.move_local_safe(x=1.0):
                 break
-        self.move_local(x=-1.0)
+        self.move_local(x=-1.5)
 
     def go_most_up(self):
         while not rospy.is_shutdown():
-            if self.move_local_safe(z=1.0):
+            if not self.move_local_safe(z=1.0):
                 break
-        self.move_local(z=-1.0)
+        self.move_local(z=-1.5)
 
     def go_most_down(self):
         while not rospy.is_shutdown():
-            if self.move_local_safe(z=-1.0):
+            if not self.move_local_safe(z=-1.0):
                 break
-        self.move_local(z=1.0)
+        self.move_local(z=1.5)

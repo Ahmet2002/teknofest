@@ -44,7 +44,7 @@ class MixinServiceHandler:
         result = self.service_caller(self.service_land, timeout=30)
         if not result.success:
             rospy.logerr("Landing Error !")
-        while self.z > 0.05:
+        while self.z > 0.1:
             print(str(self.z))
             self.rate.sleep()
 

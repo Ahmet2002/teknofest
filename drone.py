@@ -21,11 +21,11 @@ class MyDroneHandler(DroneHandler):
         time.sleep(2.0)
 
 
-        # self.move_global_rel(yaw=0.0)
+        self.move_global_rel(yaw=0.0)
         self.duvara_bak(distance=2.0)
         self.print_pose()
-        print("a"*100)
-        self.go_most_up()
+        # print("a"*100)
+        # self.go_most_up()
         # self.wall.sentence = input("Type the sentence.\n")
         # self.run_mission()
 
@@ -37,8 +37,8 @@ class MyDroneHandler(DroneHandler):
         # self.add_wp_to_wp_list(3,20,False,True,0.0,0.0,0.0,float('nan'), -35.36300493, 149.16517528, 50)
         # self.push_wps()
         
-        # self.land()
-        self.change_mode(MODE_RTL)
+        self.land()
+        # self.change_mode(MODE_RTL)
         self.disconnect()
 
 
