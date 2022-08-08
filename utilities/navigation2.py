@@ -3,15 +3,14 @@ from simple_pid import PID
 
 class MixinNavigation2:
     def duvara_bak(self, distance=5.0):
-        pid_yaw = PID(Kp=0.4, Ki=0.4, Kd=1.0, setpoint=0.0, sample_time=0.1)
-        pid_yaw.output_limits = (-0.1, 0.1)
+        pid_yaw = PID(Kp=0.3, Ki=0.2, Kd=1.0, setpoint=0.0, sample_time=0.1)
+        pid_yaw.output_limits = (-0.3, 0.3)
         self.config.distance = distance
         diff = 0.0
         control = 0.0
         while not rospy.is_shutdown():
             self.print_pose()
             if (self.left > 40.0) or (self.right > 40.0):
-                print()
                 if self.right <= 40.0:
                     control = -self.config.max_yaw_vel
                 else:
@@ -19,13 +18,13 @@ class MixinNavigation2:
             else:
                 diff = self.left - self.right
                 print("diff : ", diff)
-                if abs(diff) < 0.3:
+                if abs(diff) < 0.005 * self.get_front():
                     self.fixed_yaw = self.yaw
                     break
                 control = pid_yaw(diff)
             self.set_vel_global(yaw_vel=control)
             self.rate.sleep()
-        # self.move_local_safe(y=(self.get_front() - distance))
+        self.move_local_safe(y=(self.get_front() - distance))
 
     def go_2d_on_wall(self, x=0.0, y=0.0):
         wall = self.wall
@@ -98,6 +97,7 @@ class MixinNavigation2:
                 self.disconnect()
 
     def run_mission_without_lidar(self, fixed_yaw):
+        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
         self.wall.sentence = input("Type the sentence.\n")
         self.get_mission()
         for wp in self.wps:

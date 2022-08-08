@@ -11,7 +11,7 @@ class MixinNavigation:
         pid_x = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=x, sample_time=0.1)
         pid_y = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=y, sample_time=0.1)
         pid_z = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=z, sample_time=0.1)
-        pid_yaw = PID(Kp=0.5, Ki=0.0, Kd=1.0, setpoint=0.0, sample_time=0.1)
+        pid_yaw = PID(Kp=0.2, Ki=0.1, Kd=0.3, setpoint=self.fixed_yaw, sample_time=0.1)
         pid_x.output_limits = (-vel, vel)
         pid_y.output_limits = (-vel, vel)
         pid_z.output_limits = (-vel, vel)
@@ -28,7 +28,7 @@ class MixinNavigation:
                 rospy.logerr("out of wall !")
                 return False
             else:
-                yaw_vel = pid_yaw(self.left - self.right)
+                yaw_vel = pid_yaw(self.yaw)
             
             self.set_vel_global(vel_x, vel_y, vel_z, yaw_vel)
             self.rate.sleep()

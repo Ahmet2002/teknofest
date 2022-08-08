@@ -76,7 +76,7 @@ class MixinPublishing:
         y = math.cos(angle) * y + math.sin(angle) * tmp_x
         return x, y
 
-    def move_global(self, lat=None, lon=None, alt=None, yaw=None):
+    def move_global(self, lat, lon, alt, yaw=None):
         data = mavros_msgs.msg.GlobalPositionTarget()
         data.latitude = lat
         data.longitude = lon
