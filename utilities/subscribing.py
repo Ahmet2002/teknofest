@@ -59,7 +59,8 @@ class MixinSubscribing:
         print("------------------------------")
         print("latitude : ", self.latitude)
         print("longitude : ", self.longitude)
-        print("altitude : ", self.altitude)
+        print("altitude : ", self.altitude - self.home[2])
+        print("yaw : ", self.yaw)
 
     def print_vel(self):
         print("----------------------------")

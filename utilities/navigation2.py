@@ -2,41 +2,6 @@ from utilities.utils import *
 from simple_pid import PID
 
 class MixinNavigation2:
-    def duvara_bak(self, distance=5.0):
-        pid_yaw = PID(Kp=0.3, Ki=0.2, Kd=1.0, setpoint=0.0, sample_time=0.1)
-        pid_yaw.output_limits = (-0.3, 0.3)
-        self.config.distance = distance
-        diff = 0.0
-        control = 0.0
-        while not rospy.is_shutdown():
-            self.print_pose()
-            if (self.left > 40.0) or (self.right > 40.0):
-                if self.right <= 40.0:
-                    control = -self.config.max_yaw_vel
-                else:
-                    control = self.config.max_yaw_vel
-            else:
-                diff = self.left - self.right
-                print("diff : ", diff)
-                if abs(diff) < 0.005 * self.get_front():
-                    self.fixed_yaw = self.yaw
-                    break
-                control = pid_yaw(diff)
-            self.set_vel_global(yaw_vel=control)
-            self.rate.sleep()
-        self.move_local_safe(y=(self.get_front() - distance))
-
-    def go_2d_on_wall(self, x=0.0, y=0.0):
-        wall = self.wall
-        if not wall.is_init:
-            rospy.logerr("Error on go_2d_on_wall() function.")
-            rospy.logerr("wall has not been initialized yet.")
-            return
-        if not wall.in_borders(x=x, y=y):
-            rospy.logerr("out of walls borders!")
-            return
-        (target_x, target_y, target_z) = wall.get_exact_loc(x=x, y=y, transform=self.transform)
-        self.move_global_safe(target_x, target_y, target_z)
 
     def __get_new_from_prev(self, prev_wp:Waypoint, dx=0.0, dy=0.0, dz=0.0, is_open=False):
         new_wp = Waypoint(x=dx, y=dy, z=dz, is_open=is_open)
@@ -77,25 +42,6 @@ class MixinNavigation2:
         for wp in self.wps:
             print("({}, {}, {})".format(wp.x, wp.y, wp.z))
 
-    def run_mission(self, vel=0.3):
-        config = self.config
-        for c in self.wall.sentence:
-            total_height = 0.0
-            total_width = 0.0
-            wp_list = datas[c]["list"]
-            box_width = datas[c]["width"]
-            for wp in wp_list:
-                total_height += wp.z * config.font_scale
-                total_width += wp.x * config.font_scale
-                self.is_open = wp.is_open
-                if not self.move_local_safe(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale)):
-                    self.change_mode(MODE_RTL)
-                    self.disconnect()
-            self.is_open = False
-            if not self.move_local_safe(x=(box_width - total_width), z=-total_height):
-                self.change_mode(MODE_RTL)
-                self.disconnect()
-
     def run_mission_without_lidar(self, fixed_yaw):
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
         self.wall.sentence = input("Type the sentence.\n")
@@ -105,17 +51,3 @@ class MixinNavigation2:
             print("is_open : ", wp.is_open)
             self.move_global(wp.x, wp.y, wp.z, fixed_yaw)
             time.sleep(0.2)
-
-    def init_wall(self, distance=5.0):
-        self.duvara_bak(distance=distance)
-        self.go_most_up()
-        print("en yukarıya gitti")
-        self.go_most_left()
-        print("En sola gitti")
-    
-    def yazi_yaz(self, distance_to_wall):
-        # self.init_wall(distance_to_wall)
-        self.duvara_bak(distance=distance_to_wall)
-        self.wall.sentence = input("Please enter the sentence to be painted on the wall\n")
-        self.run_mission()
-        rospy.logdebug("mission completed !")
