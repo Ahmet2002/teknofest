@@ -37,15 +37,21 @@ class MixinSubscribing:
         self.is_armed = data.armed
 
     def lidar_sim_cb(self, data):
-        self.angle_offset = angle2radian(15.0)
-        self.right = data.ranges[int((math.pi - self.angle_offset) / data.angle_increment)]
-        self.left = data.ranges[int((math.pi + self.angle_offset) / data.angle_increment)]
+        if self.single_lidar_mode:
+            self.front = data.ranges[int((math.pi) / data.angle_increment)]
+        else:
+            self.angle_offset = angle2radian(15.0)
+            self.right = data.ranges[int((math.pi - self.angle_offset) / data.angle_increment)]
+            self.left = data.ranges[int((math.pi + self.angle_offset) / data.angle_increment)]
     
     def left_range_cb(self, data):
         self.left = data.range
     
     def right_range_cb(self, data):
         self.right = data.range
+    
+    def front_range_cb(self, data):
+        self.front = data.range
 
     def print_pose(self):
         print("----------------------------")
@@ -60,6 +66,7 @@ class MixinSubscribing:
         print("latitude : ", self.latitude)
         print("longitude : ", self.longitude)
         print("altitude : ", self.altitude - self.home[2])
+        print("front : ", self.front)
         print("yaw : ", self.yaw)
 
     def print_vel(self):

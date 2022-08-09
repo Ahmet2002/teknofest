@@ -42,9 +42,28 @@ class MixinNavigation2:
         for wp in self.wps:
             print("({}, {}, {})".format(wp.x, wp.y, wp.z))
 
+    def run_mission_with_lidar(self, fixed_yaw, distance=None):
+        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
+        self.move_local(y=(self.front - distance))
+        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
+        sentence = input("Type the sentence.\n")
+        self.wall.sentence = sentence.upper().strip()
+        self.get_mission()
+        for wp in self.wps:
+            self.is_open = wp.is_open
+            # if self.is_open:
+            #     nozzle_on()
+            # else:
+            #     nozzle_off()
+            print("is_open : ", str(wp.is_open))
+            self.move_global(wp.x, wp.y, wp.z, fixed_yaw)
+            # nozzle_off()
+            time.sleep(0.7)
+
     def run_mission_without_lidar(self, fixed_yaw):
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
-        self.wall.sentence = input("Type the sentence.\n")
+        sentence = input("Type the sentence.\n")
+        self.wall.sentence = sentence.upper().strip()
         self.get_mission()
         for wp in self.wps:
             self.is_open = wp.is_open
