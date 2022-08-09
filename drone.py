@@ -3,6 +3,8 @@ import time
 from utilities.droneHanler import DroneHandler
 from utilities.utils import *
 
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(33,GPIO.OUT)
 
 class MyDroneHandler(DroneHandler):
     def __init__(self):
