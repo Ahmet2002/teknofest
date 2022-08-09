@@ -11,13 +11,13 @@ import math
 import rospy
 import numpy as np
 from utilities.service import Service
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
-def nozzle_on():
-	GPIO.output(33,GPIO.HIGH)
+# def nozzle_on():
+# 	GPIO.output(33,GPIO.HIGH)
 
-def nozzle_off():
-	GPIO.output(33,GPIO.LOW)
+# def nozzle_off():
+# 	GPIO.output(33,GPIO.LOW)
 
 
 def angle2radian(angle: float):
@@ -111,11 +111,11 @@ datas = {
 			"width" : 2.0},
 		"C" : { "list" : [Waypoint(x=1.5), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
 			"width" : 2.0},
-		"D" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
+		"D" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
 			"width" : 2.0},
 		"G" : { "list" : [Waypoint(x=1.5), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-0.75, is_open=True)],
 			"width" : 2.0},
-		"H" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
+		"H" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5), Waypoint(z=3.0, is_open=True)],
 			"width" : 2.0},
 		"J" : { "list" : [Waypoint(z=-2.25), Waypoint(z=0.75, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
 			"width" : 2.0},
@@ -125,14 +125,14 @@ datas = {
 			"width" : 0.5},
 		"L" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
 			"width" : 2.0},
-		"M" : { "list" : [Waypoint(z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=1.0, z=-2.25, is_open=True), Waypoint(x=1.0, z=2.25, is_open=True), Waypoint(z=-3.0, is_open=True)],
+		"M" : { "list" : [Waypoint(z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=1.0, z=-1.5, is_open=True), Waypoint(x=1.0, z=1.5, is_open=True), Waypoint(z=-3.0, is_open=True)],
 			"width" : 2.5},
 		"P" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True)],
 			"width" : 2.0},
 		"R" : { "list" : [Waypoint(z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(x=1.5, z=-1.5, is_open=True)],
 			"width" : 2.0},
-		"U" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
-			"width" : 2.0},
+		"U" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=2.0, is_open=True), Waypoint(z=3.0, is_open=True)],
+			"width" : 2.5},
 		"V" : { "list" : [Waypoint(x=1.0, z=-3.0, is_open=True), Waypoint(x=1.0, z=3.0, is_open=True)],
 			"width" : 2.5},
 		"Y" : { "list" : [Waypoint(x=0.75, z=-1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=0.75, z=1.5, is_open=True)],
@@ -143,7 +143,7 @@ datas = {
 			"width" : 1.25},
 		"3" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=1.5, is_open=True)],
 			"width" : 2.0},
-		"4" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, z=1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=-1.5, z=1.5), Waypoint(x=1.5, is_open=True)],
+		"4" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.25, z=1.5, is_open=True), Waypoint(z=-2.25, is_open=True), Waypoint(x=-1.25, z=0.75), Waypoint(x=1.5, is_open=True)],
 			"width" : 2.0},
 		"5" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
 			"width" : 2.0},
@@ -151,7 +151,7 @@ datas = {
 			"width" : 2.0},
 		"7" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(z=-3.0, is_open=True)],
 			"width" : 2.0},
-		"8" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(x=1.5), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True)],
+		"8" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True)],
 			"width" : 2.0},
 		"9" : { "list" : [Waypoint(x=1.5, z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
 			"width" : 2.0},

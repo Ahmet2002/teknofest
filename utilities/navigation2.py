@@ -48,11 +48,11 @@ class MixinNavigation2:
         self.get_mission()
         for wp in self.wps:
             self.is_open = wp.is_open
-            if self.is_open:
-                nozzle_on()
-            else:
-                nozzle_off()
+            # if self.is_open:
+            #     nozzle_on()
+            # else:
+            #     nozzle_off()
             print("is_open : ", wp.is_open)
             self.move_global(wp.x, wp.y, wp.z, fixed_yaw)
-            nozzle_off()
+            # nozzle_off()
             time.sleep(0.2)
