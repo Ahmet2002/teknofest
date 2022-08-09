@@ -104,8 +104,292 @@ MODE_SMART_RTL = "SMART_RTL"
 MODE_GUIDED = "GUIDED"
 MODE_INITIALISING = "INITIALISING"
 
+position_array_A = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 0],
+                    [font / 2, -font, 1],
+                    [font / 2, font, 1],
+                    [-font * 3 / 4, -font / 2, 0],
+                    [font / 2, 0, 1],
+                    [font / 4,-font/2, 0]]
+
+position_array_B = [[iki_harf_arasi_bosluk,0, 0],
+                    [font / 2, 0, 1],
+                    [0, font, 1],
+                    [-font / 2, 0, 1],
+                    [0, -font, 1],
+                    [0, font/2, 0],
+                    [font / 2, 0, 1],
+                    [0, -font/2, 0]]
+
+position_array_C = [[iki_harf_arasi_bosluk,0, 0],
+                    [font / 2, 0, 0],
+                    [-font / 2, 0, 1],
+                    [0, font, 1],
+                    [font / 2, 0, 1],
+                    [0, -font, 0]]
+
+position_array_D = [[iki_harf_arasi_bosluk,0, 0],
+                    [font / 2, 0, 0],
+                    [-font / 2, 0, 1],
+                    [0, font, 1],
+                    [font / 2, 0, 1],
+                    [0, -font, 1]]
+
+position_array_E = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [font / 2, 0, 1],
+                    [0, -font/2, 0],
+                    [-font / 2, 0, 1],
+                    [0, -font / 2, 0],
+                    [font / 2, 0, 1]]
+
+position_array_F = [[iki_harf_arasi_bosluk, 0, 0],
+                    [0, font, 1],
+                    [0, -font / 2, 0],
+                    [font / 4, 0,1],
+                    [-font / 4, -font/2, 0],
+                    [font / 2, 0, 1]]
+
+position_array_G = [[iki_harf_arasi_bosluk,0, 0],
+                    [font / 2, 0, 0],
+                    [-font / 2, 0, 1],
+                    [0, font, 1],
+                    [font / 2, 0, 1],
+                    [0, -font / 2, 1],
+                    [-font / 4, 0, 0],
+                    [font / 4, -font / 2, 0]]
+
+position_array_H = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [0, -font/2, 0],
+                    [font / 2, 0, 1],
+                    [0, font/2, 0],
+                    [0, -font, 1]]
+
+position_array_I = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [0, -font, 0]]
+
+position_array_İ = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [0, -font* 10/8, 0],
+                    [0, font * 1/8, 1],
+                    [0, font * 1/8, 0]]
+
+position_array_J = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font*3/4, 0],
+                    [0, font*1/4, 1],
+                    [font / 2, 0, 1],
+                    [0, -font, 1]]
+
+position_array_K = [[iki_harf_arasi_bosluk, 0, 0],
+                    [0, font, 1],
+                    [font/2, 0, 0],
+                    [-font / 2, -font / 2, 1],
+                    [font / 2, -font / 2, 1]]
+
+position_array_L = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [font / 2, 0, 1]]
+
+position_array_M = [[iki_harf_arasi_bosluk, 0, 0],
+                    [0, font, 0],
+                    [0, -font, 1],
+                    [font*3/8, font*5/8, 1],
+                    [font*3/8, -font*5/8, 1],
+                    [0, font, 1],
+                    [0, -font, 0]]
+
+position_array_N = [[iki_harf_arasi_bosluk, 0, 0],
+                    [0, font, 0],
+                    [0, -font, 1],
+                    [font/2, font, 1],
+                    [0, -font, 1]]
+
+position_array_O = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [font/2, 0, 1],
+                    [0, -font, 1],
+                    [-font/2, 0, 1],
+                    [font/2, 0, 0]]
+
+position_array_P = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 0],
+                    [0, -font, 1],
+                    [font / 2, 0, 1],
+                    [0, font/2, 1],
+                    [-font / 2, 0, 1],
+                    [font / 2, -font/2, 0]]
+
+position_array_R = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 0],
+                    [0, -font, 1],
+                    [font / 2, 0, 1],
+                    [0, font/2, 1],
+                    [-font / 2, 0, 1],
+                    [font / 2, font/2, 0],
+                    [0, -font, 0]]
+
+position_array_S = [[iki_harf_arasi_bosluk, 0, 0],
+                    [0, font, 0],
+                    [font/2, 0, 1],
+                    [0, -font / 2, 1],
+                    [-font / 2, 0, 1],
+                    [0,  -font / 2, 1],
+                    [font/2, 0,  1]]
+
+position_array_T = [[iki_harf_arasi_bosluk,0, 0],
+                    [font, 0, 1],
+                    [-font / 2, 0, 0],
+                    [0,font,1],
+                    [font / 2,-font, 0]]
+
+position_array_U = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [font/2, 0, 1],
+                    [0, -font, 1]]
+
+
+position_array_V = [[iki_harf_arasi_bosluk,0, 0],
+                    [font*3/8, font, 1],
+                    [font*3/8,-font, 1]]
+
+position_array_Y = [[iki_harf_arasi_bosluk,0, 0],
+                    [font/4, font/2, 1],
+                    [0,font/2, 1],
+                    [0,-font/2,0],
+                    [font/4,-font/2,1]]
+
+position_array_Z = [[iki_harf_arasi_bosluk,0, 0],
+                    [font/2, 0, 1],
+                    [-font/2,font, 1],
+                    [font/2,0,1],
+                    [0,-font,0]]
+
+position_array_0 = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [font/2, 0, 1],
+                    [0, -font, 1],
+                    [-font/2, 0, 1],
+                    [font/2, 0, 0]]
+
+position_array_1 = [[iki_harf_arasi_bosluk,0, 0],
+                    [-font/4, font/4, 1],
+                    [font/4,font/4, 0],
+                    [0,font,1],
+                    [0,-font,0]]
+
+position_array_2 = [[iki_harf_arasi_bosluk,0, 0],
+                    [font/2, 0, 1],
+                    [0,font/2, 1],
+                    [-font/2,0,1],
+                    [0,font/2,1],
+                    [font/2,0,1],
+                    [0,-font,0]]
+
+position_array_3 = [[iki_harf_arasi_bosluk,0, 0],
+                    [font/2, 0, 1],
+                    [0,font/2, 1],
+                    [-font/2,0,1],
+                    [0,font/2,0],
+                    [font/2,0,1],
+                    [0,-font,1]]
+
+position_array_4 = [[iki_harf_arasi_bosluk,0, 0],
+                    [-font/2, font/2, 1],
+                    [font/2,0, 1],
+                    [0,font/2,0],
+                    [0,-font,1]]
+
+position_array_5 = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, -font, 0],
+                    [font/2,0, 1],
+                    [0,-font/2,1],
+                    [-font/2,0,1],
+                    [0,-font/2,1],
+
+position_array_6 = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [font/2,0, 1],
+                    [0,-font/2,1],
+                    [-font/2,0,1],
+                    [0,-font/2,0],
+                    [font/2,0,1]]
+
+position_array_7 = [[iki_harf_arasi_bosluk,0, 0],
+                    [font/2, 0, 1],
+                    [0,font, 1],
+                    [0,-font,0]]
+
+position_array_8 = [[iki_harf_arasi_bosluk,0, 0],
+                    [0, font, 1],
+                    [font/2,0, 1],
+                    [0,-font/2,1],
+                    [-font/2,0,1],
+                    [font/2,0,0],
+                    [0,-font/2,1],
+                    [-font/2,0,1],
+                    [font/2,0,0]]
+
+position_array_9 = [[iki_harf_arasi_bosluk,0, 0],
+                    [font/2, 0, 1],
+                    [0,font, 1],
+                    [0,-font/2,0],
+                    [-font/2,0,1],
+                    [0,-font/2,1],
+                    [font/2,0,0]]
 
 datas = {
+		"A" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.0, z=3.0, is_open=True), Waypoint(x=1.0, z=-3.0, is_open=True), Waypoint(x=-1.5, z=1.5), Waypoint(x=1.0, is_open=True)],
+			"width" : 2.5},
+		"B" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True)],
+			"width" : 2.0},
+		"C" : { "list" : [Waypoint(x=1.5), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
+		"D" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
+			"width" : 2.0},
+		"G" : { "list" : [Waypoint(x=1.5), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-0.75, is_open=True)],
+			"width" : 2.0},
+		"H" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
+			"width" : 2.0},
+		"J" : { "list" : [Waypoint(z=-2.25), Waypoint(z=0.75, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
+			"width" : 2.0},
+		"I" : { "list" : [Waypoint(z=-3.0, is_open=True)],
+			"width" : 0.5},
+		"İ" : { "list" : [Waypoint(z=-0.5, is_open=True), Waypoint(z=-0.5), Waypoint(z=-2.0, is_open=True)],
+			"width" : 0.5},
+		"L" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
+		"M" : { "list" : [Waypoint(z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=1.0, z=-2.25, is_open=True), Waypoint(x=1.0, z=2.25, is_open=True), Waypoint(z=-3.0, is_open=True)],
+			"width" : 2.5},
+		"P" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True)],
+			"width" : 2.0},
+		"R" : { "list" : [Waypoint(z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(x=1.5, z=-1.5, is_open=True)],
+			"width" : 2.0},
+		"U" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
+			"width" : 2.0},
+		"V" : { "list" : [Waypoint(x=1.0, z=-3.0, is_open=True), Waypoint(x=1.0, z=3.0, is_open=True)],
+			"width" : 2.5},
+		"Y" : { "list" : [Waypoint(x=0.75, z=-1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=0.75, z=1.5, is_open=True)],
+			"width" : 2.0},
+		"Z" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(x=-1.5, z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
+		"1" : { "list" : [Waypoint(z=-0.75), Waypoint(x=0.75, z=0.75, is_open=True), Waypoint(z=-3.0, is_open=True)],
+			"width" : 1.25},
+		"3" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
+		"4" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, z=1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=-1.5, z=1.5), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
+		"5" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
+		"6" : { "list" : [Waypoint(z=-1.5), Waypoint(z=-1.5, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
+		"7" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(z=-3.0, is_open=True)],
+			"width" : 2.0},
+		"8" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(x=1.5), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True)],
+			"width" : 2.0},
+		"9" : { "list" : [Waypoint(x=1.5, z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
+			"width" : 2.0},
 		"T" : { "list" : [Waypoint(x=3.0, is_open=True),Waypoint(x=-1.5),Waypoint(z=-3.0, is_open=True)],
 			"width" : 3.5},
 		"E" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=-2.0, is_open=True), Waypoint(z=1.5), Waypoint(x=2.0, is_open=True)],
@@ -114,16 +398,16 @@ datas = {
 			"width" : 2.5},
 		"N" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0), Waypoint(x=-2.0 ,z=3.0, is_open=True), Waypoint(x=2.0), Waypoint(z=-3.0, is_open=True)],
 			"width" : 2.5},
-		"O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
-			"width" : 2.5},
+		"O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
+			"width" : 2.0},
 		"F" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=2.0), Waypoint(x=2.0, is_open=True), Waypoint(z=1.0), Waypoint(x=-2.0, is_open=True)],
 			"width" : 2.5},
 		"S" : { "list" : [Waypoint(z=-3.0), Waypoint(2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(2.0, is_open=True)], 
 			"width" : 2.5},
 		"2" : { "list" : [Waypoint(2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(-2.0, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(2.0, is_open=True)],
 			"width" : 2.5},
-		"0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(2.0, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-2.0, is_open=True)],
-			"width" : 2.5}
+		"0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
+			"width" : 2.0},
 		}
 
 
