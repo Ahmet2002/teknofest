@@ -52,7 +52,7 @@ class MixinNavigation2:
             #     nozzle_on()
             # else:
             #     nozzle_off()
-            print("is_open : ", wp.is_open)
+            print("is_open : ", str(wp.is_open))
             self.move_global(wp.x, wp.y, wp.z, fixed_yaw)
             # nozzle_off()
-            time.sleep(0.2)
+            time.sleep(0.7)
