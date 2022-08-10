@@ -51,7 +51,7 @@ class MixinPublishing:
         alt = self.altitude - self.home[2] + z
         self.move_global(lat, lon, alt, yaw=(self.yaw + angle2radian(yaw)))
 
-    def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.25, tolerance_ang=0.1, is_global=False):
+    def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.15, tolerance_ang=0.1, is_global=False):
         if not is_global:
             distance = get_distance(self.x, self.y, self.z, x, y, z)
         else:

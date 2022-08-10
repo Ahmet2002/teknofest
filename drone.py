@@ -26,8 +26,8 @@ class MyDroneHandler(DroneHandler):
         # self.duvara_bak(distance=2.0)
         # self.wall.sentence = input("Type the sentence.\n")
         # self.run_mission()
-        self.run_mission_with_lidar_wp2wp(3.14, 1.5)
-
+        self.run_mission_with_lidar_wp2wp(3.14, 2.0)
+        # self.run_mission(3.14, 1.5)
         # self.change_mode(MODE_AUTO)
         # print(str(self.clear_wps()))
         # self.add_wp_to_wp_list(3,22,True,True,0.0,0.0,0.0,float('nan'), -35.36326767, 149.16524363, 50)

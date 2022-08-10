@@ -28,6 +28,8 @@ class MixinNavigation:
         self.move_local_safe(y=(self.get_front() - distance))
 
     def get_front(self):
+        if self.single_lidar_mode:
+            return self.front
         return (self.right * math.cos(self.angle_offset))
         
     def move_global_safe(self, x:float, y:float, z:float, vel=0.2):
@@ -36,13 +38,13 @@ class MixinNavigation:
         pid_y = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=y, sample_time=0.1)
         pid_z = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=z, sample_time=0.1)
         pid_yaw = PID(Kp=0.2, Ki=0.1, Kd=0.3, setpoint=self.fixed_yaw, sample_time=0.1)
-        pid_front = PID(Kp=0.3, Ki=0.1, Kd=0.2, setpoint=config.distance, sample_time=0.1)
+        # pid_front = PID(Kp=0.3, Ki=0.1, Kd=0.2, setpoint=config.distance, sample_time=0.1)
         pid_x.output_limits = (-vel, vel)
         pid_y.output_limits = (-vel, vel)
         pid_z.output_limits = (-vel, vel)
-        pid_front.output_limits = (-vel, vel)
+        # pid_front.output_limits = (-vel, vel)
         pid_yaw.output_limits = (-0.2, 0.2)
-        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, check_yaw=False):
+        while not rospy.is_shutdown() and not self.is_target_reached(x, y, z, yaw=self.fixed_yaw, check_yaw=True):
             print("target_x : ", x)
             print("target_y : ", y)
             print("target_z : ", z)
@@ -56,10 +58,10 @@ class MixinNavigation:
             else:
                 yaw_vel = pid_yaw(self.yaw)
 
-            control = pid_front(self.front)
-            (x_vel, y_vel) = self.transform(0.0, control)
-            vel_x += x_vel
-            vel_y += y_vel
+            # control = pid_front(self.front)
+            # (x_vel, y_vel) = self.transform(0.0, control)
+            # vel_x += x_vel
+            # vel_y += y_vel
             self.set_vel_global(vel_x, vel_y, vel_z, yaw_vel)
             self.rate.sleep()
         
@@ -119,6 +121,7 @@ class MixinNavigation:
         self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
         config = self.config
         config.distance = distance
+        self.fixed_yaw = fixed_yaw
         sentence = input("Type the sentence.\n")
         self.wall.sentence = sentence.upper().strip()
         for c in self.wall.sentence:

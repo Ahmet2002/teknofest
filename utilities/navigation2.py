@@ -60,7 +60,7 @@ class MixinNavigation2:
             total_height = 0.0
             total_width = 0.0
             wp_list = datas[c]["list"]
-            box_width = datas[c]["width"]
+            box_width = datas[c]["width"] * config.font_scale
             for wp in wp_list:
                 total_height += wp.z * config.font_scale
                 total_width += wp.x * config.font_scale
