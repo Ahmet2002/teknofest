@@ -63,11 +63,11 @@ class MixinServiceHandler:
         result = self.service_caller(self.service_get_param, timeout=30)
         return result.success, result.value.integer, result.value.real
 
-    def set_param(self, param="WPNAV_SPEED", value_real=0.0):
+    def set_param(self, param, value_real):
         data = mavros_msgs.srv.ParamSetRequest()
         data.param_id = param
         data.value.real = value_real
-        self.service_get_param.set_data(data)
+        self.service_set_param.set_data(data)
         result = self.service_caller(self.service_set_param, timeout=30)
         return result.success
 

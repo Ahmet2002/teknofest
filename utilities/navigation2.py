@@ -60,10 +60,10 @@ class MixinNavigation2:
             total_height = 0.0
             total_width = 0.0
             wp_list = datas[c]["list"]
-            box_width = datas[c]["width"] * config.font_scale
+            box_width = datas[c]["width"]
             for wp in wp_list:
-                total_height += wp.z * config.font_scale
-                total_width += wp.x * config.font_scale
+                total_height += wp.z
+                total_width += wp.x
                 self.is_open = wp.is_open
                 # if self.is_open:
                 #     nozzle_on()
@@ -72,9 +72,11 @@ class MixinNavigation2:
                 self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
                 # nozzle_off()
                 self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+                time.sleep(0.5)
             self.is_open = False
-            self.move_local(x=(box_width - total_width), z=-total_height)
+            self.move_local(x=(box_width - total_width)*config.font_scale, z=-total_height*config.font_scale)
             self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+            time.sleep(0.5)
 
     def run_mission_with_lidar(self, fixed_yaw, distance=None):
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)

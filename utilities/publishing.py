@@ -44,14 +44,14 @@ class MixinPublishing:
                 break
             self.rate.sleep()
 
-    def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0):
+    def move_local(self, x=0.0, y=0.0, z=0.0, yaw=0.0, yaw_rate=0.1):
         (x, y) = self.transform(x, y)
         lat = self.latitude + (180.0/math.pi)*(y/6378137)
         lon = self.longitude + (180.0/math.pi)*(x/6378137)/math.cos(math.pi/180.0*self.latitude)
         alt = self.altitude - self.home[2] + z
-        self.move_global(lat, lon, alt, yaw=(self.yaw + angle2radian(yaw)))
+        self.move_global(lat, lon, alt, yaw=(self.yaw + angle2radian(yaw)), yaw_rate=yaw_rate)
 
-    def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.15, tolerance_ang=0.1, is_global=False):
+    def is_target_reached(self, x, y, z, yaw=None, check_yaw=True, tolerance_lin=0.2, tolerance_ang=0.1, is_global=False):
         if not is_global:
             distance = get_distance(self.x, self.y, self.z, x, y, z)
         else:
@@ -76,18 +76,19 @@ class MixinPublishing:
         y = math.cos(angle) * y + math.sin(angle) * tmp_x
         return x, y
 
-    def move_global(self, lat, lon, alt, yaw=None):
+    def move_global(self, lat, lon, alt, yaw=None, yaw_rate=0.1):
         data = mavros_msgs.msg.GlobalPositionTarget()
         data.latitude = lat
         data.longitude = lon
         data.altitude = alt
-        data.type_mask = data.IGNORE_AFX + data.IGNORE_AFY + data.IGNORE_AFZ + data.IGNORE_VX + data.IGNORE_VY + data.IGNORE_VZ + data.IGNORE_YAW_RATE
+        data.type_mask = data.IGNORE_AFX + data.IGNORE_AFY + data.IGNORE_AFZ + data.IGNORE_VX + data.IGNORE_VY + data.IGNORE_VZ
         data.coordinate_frame = data.FRAME_GLOBAL_REL_ALT
         if yaw == None:
-            data.type_mask += data.IGNORE_YAW
+            data.type_mask += (data.IGNORE_YAW + data.IGNORE_YAW_RATE)
             check_yaw = False
         else:
             data.yaw = yaw
+            data.yaw_rate = yaw_rate
             check_yaw = True
         data.header.stamp = rospy.Time.now()
         self.pub_pose_global.publish(data)
