@@ -42,6 +42,40 @@ class MixinNavigation2:
         for wp in self.wps:
             print("({}, {}, {})".format(wp.x, wp.y, wp.z))
 
+    def aciyi_ve_uzakligi_ayarla(self, fixed_yaw, distance):
+        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
+        if math.isinf(self.front):
+            self.change_mode(MODE_RTL)
+            self.disconnect()
+        self.move_local(y=(self.front - distance))
+        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
+        print("acimi ve uzakligimi ayarladim su an hazirim.")
+
+    def run_mission_with_lidar_wp2wp(self, fixed_yaw, distance):
+        self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+        config = self.config
+        sentence = input("Type the sentence.\n")
+        self.wall.sentence = sentence.upper().strip()
+        for c in self.wall.sentence:
+            total_height = 0.0
+            total_width = 0.0
+            wp_list = datas[c]["list"]
+            box_width = datas[c]["width"]
+            for wp in wp_list:
+                total_height += wp.z * config.font_scale
+                total_width += wp.x * config.font_scale
+                self.is_open = wp.is_open
+                # if self.is_open:
+                #     nozzle_on()
+                # else:
+                #     nozzle_off()
+                self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
+                # nozzle_off()
+                self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+            self.is_open = False
+            self.move_local(x=(box_width - total_width), z=-total_height)
+            self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+
     def run_mission_with_lidar(self, fixed_yaw, distance=None):
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
         self.move_local(y=(self.front - distance))

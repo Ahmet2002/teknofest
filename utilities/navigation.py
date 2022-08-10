@@ -30,7 +30,7 @@ class MixinNavigation:
     def get_front(self):
         return (self.right * math.cos(self.angle_offset))
         
-    def move_global_safe(self, x:float, y:float, z:float, vel=0.15):
+    def move_global_safe(self, x:float, y:float, z:float, vel=0.2):
         config = self.config
         pid_x = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=x, sample_time=0.1)
         pid_y = PID(Kp=0.5, Ki=0.2, Kd=0.4, setpoint=y, sample_time=0.1)
@@ -50,21 +50,25 @@ class MixinNavigation:
             (vel_x, vel_y, vel_z) = (pid_x(self.x), pid_y(self.y), pid_z(self.z))
 
             # Compute yaw vel
-            if (self.left > 40.0) or (self.right > 40.0):
+            if math.isinf(self.front):
                 rospy.logerr("out of wall !")
                 return False
             else:
                 yaw_vel = pid_yaw(self.yaw)
-            
+
+            control = pid_front(self.front)
+            (x_vel, y_vel) = self.transform(0.0, control)
+            vel_x += x_vel
+            vel_y += y_vel
             self.set_vel_global(vel_x, vel_y, vel_z, yaw_vel)
             self.rate.sleep()
         
         return True
 
-    def move_local_safe(self,x=0.0, y=0.0, z=0.0):
+    def move_local_safe(self,x=0.0, y=0.0, z=0.0, vel=0.2):
         (x, y) = self.transform(x, y)
         (x, y, z) = (x + self.x, y + self.y, z + self.z)
-        if self.move_global_safe(x, y, z):
+        if self.move_global_safe(x, y, z, vel=vel):
             return True
         return False
 
@@ -95,7 +99,7 @@ class MixinNavigation:
     def init_wall(self, distance=5.0):
         self.duvara_bak(distance=distance)
         self.go_most_up()
-        print("en yukarıya gitti")
+        print("en yukariya gitti")
         self.go_most_left()
         print("En sola gitti")
 
@@ -111,8 +115,12 @@ class MixinNavigation:
         (target_x, target_y, target_z) = wall.get_exact_loc(x=x, y=y, transform=self.transform)
         self.move_global_safe(target_x, target_y, target_z)
 
-    def run_mission(self, vel=0.3):
+    def run_mission(self, fixed_yaw, distance, vel=0.2):
+        self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
         config = self.config
+        config.distance = distance
+        sentence = input("Type the sentence.\n")
+        self.wall.sentence = sentence.upper().strip()
         for c in self.wall.sentence:
             total_height = 0.0
             total_width = 0.0
@@ -122,11 +130,11 @@ class MixinNavigation:
                 total_height += wp.z * config.font_scale
                 total_width += wp.x * config.font_scale
                 self.is_open = wp.is_open
-                if not self.move_local_safe(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale)):
+                if not self.move_local_safe(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale), vel=vel):
                     self.change_mode(MODE_RTL)
                     self.disconnect()
             self.is_open = False
-            if not self.move_local_safe(x=(box_width - total_width), z=-total_height):
+            if not self.move_local_safe(x=(box_width - total_width), z=-total_height, vel=vel):
                 self.change_mode(MODE_RTL)
                 self.disconnect()
 
