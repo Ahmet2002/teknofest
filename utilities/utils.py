@@ -115,8 +115,8 @@ class Config:
 
 class Wall:
 	def __init__(self):
-		self.height = 0.0
-		self.width = 0.0
+		self.height = 4.0
+		self.width = 8.0
 		self.angle = 0.0
 		self.is_init = False
 		self.origin = None

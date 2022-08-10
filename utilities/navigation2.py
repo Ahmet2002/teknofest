@@ -41,31 +41,40 @@ class MixinNavigation2:
         for wp in self.wps:
             print("({}, {}, {})".format(wp.x, wp.y, wp.z))
 
-    def __aciyi_ve_uzakligi_ayarla(self, distance):
+    def __aciyi_ve_uzakligi_ayarla(self):
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], self.fixed_yaw)
         if math.isinf(self.front):
             self.change_mode(MODE_RTL)
             self.disconnect()
-        self.move_local(y=(self.front - distance))
+        self.move_local(y=(self.front - self.config.distance))
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], self.fixed_yaw)
         print("aci ve uzaklik ayarlandi, hazir.")
 
     def __yeni_satira_gec(self):
         origin = self.wall.origin
         self.move_global(origin.x, origin.y, origin.z, self.fixed_yaw)
-        self.__aciyi_ve_uzakligi_ayarla(distance=self.config.distance)
-        self.move_local(z=-self.wall.satir_araligi*self.config.font_scale)
+        self.__aciyi_ve_uzakligi_ayarla()
+        self.move_local(z=-((self.wall.satir_araligi)*self.config.font_scale))
+
+    def __satiri_ortala(self, word):
+        total_width = 0.0
+        for c in word:
+            total_width += self.wall[c][width]
+        offset = (self.wall.width - 1.0 - total_width) / 2
+        self.move_local(x=offset)
+        self.__aciyi_ve_uzakligi_ayarla()
 
     def run_mission_with_lidar_wp2wp(self, distance):
-        self.__aciyi_ve_uzakligi_ayarla(distance=distance)
         config = self.config
         wall = self.wall
         config.distance = distance
+        self.__aciyi_ve_uzakligi_ayarla()
         wall.origin = Point(self.latitude, self.longitude, self.altitude - self.home[2])
         sentence = input("Type the sentence.\n")
         wall.words = sentence.upper().strip().split(",")
         word_count = len(wall.words)
         for i in range(word_count):
+            self.__satiri_ortala(word=wall.words[i])
             for c in wall.words[i]:
                 total_height = 0.0
                 total_width = 0.0
@@ -81,11 +90,11 @@ class MixinNavigation2:
                     #     nozzle_off()
                     self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
                     # nozzle_off()
-                    self.__aciyi_ve_uzakligi_ayarla(distance=distance)
+                    self.__aciyi_ve_uzakligi_ayarla()
                     time.sleep(0.5)
                 self.is_open = False
                 self.move_local(x=(box_width - total_width)*config.font_scale, z=-total_height*config.font_scale)
-                self.__aciyi_ve_uzakligi_ayarla(distance=distance)
+                self.__aciyi_ve_uzakligi_ayarla()
                 time.sleep(0.5)
             if i != word_count - 1:
                 self.__yeni_satira_gec()

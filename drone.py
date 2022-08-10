@@ -33,7 +33,7 @@ class MyDroneHandler(DroneHandler):
         # self.wall.sentence = input("Type the sentence.\n")
         # self.run_mission()
         # self.move_global_rel(yaw=0.0)
-        self.run_mission_with_lidar_wp2wp(3.14, 2.0)
+        self.run_mission_with_lidar_wp2wp(2.0)
         # self.run_mission_without_lidar(3.14)
         # self.run_mission(3.14, 1.5)
         # self.change_mode(MODE_AUTO)
