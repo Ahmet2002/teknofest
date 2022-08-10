@@ -104,7 +104,25 @@ MODE_SMART_RTL = "SMART_RTL"
 MODE_GUIDED = "GUIDED"
 MODE_INITIALISING = "INITIALISING"
 
-datas = {
+
+
+
+class Config:
+	def __init__(self):
+		self.max_yaw_vel = 0.3
+		self.font_scale = 0.4
+		self.distance = 5.0
+
+class Wall:
+	def __init__(self):
+		self.height = 0.0
+		self.width = 0.0
+		self.angle = 0.0
+		self.is_init = False
+		self.origin = None
+		self.words = []
+		self.satir_araligi = 0.5
+		self.chars = {
 		"A" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.0, z=3.0, is_open=True), Waypoint(x=1.0, z=-3.0, is_open=True), Waypoint(x=-1.5, z=1.5), Waypoint(x=1.0, is_open=True)],
 			"width" : 2.0},
 		"B" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True)],
@@ -174,22 +192,6 @@ datas = {
 		"0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
 			"width" : 2.0},
 		}
-
-
-class Config:
-	def __init__(self):
-		self.max_yaw_vel = 0.3
-		self.font_scale = 0.4
-		self.distance = 5.0
-
-class Wall:
-	def __init__(self):
-		self.height = 0.0
-		self.width = 0.0
-		self.angle = 0.0
-		self.is_init = False
-		self.origin = Point()
-		self.sentence = ""
 
 	
 	def in_borders(self, x, y):

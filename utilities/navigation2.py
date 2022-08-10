@@ -23,9 +23,8 @@ class MixinNavigation2:
         for c in sentence:
             total_height = 0.0
             total_width = 0.0
-            wp_lst = datas[c]["list"]
-            box_width = datas[c]["width"]
-            print("box width : ", str(box_width * self.config.font_scale))
+            wp_lst = wall.chars[c]["list"]
+            box_width = wall.chars[c]["width"]
             for wp in wp_lst:
                 new_wp = self.__get_new_from_prev(prev_wp, wp.x, wp.y, wp.z, wp.is_open)
                 self.wps.append(new_wp)
@@ -42,41 +41,55 @@ class MixinNavigation2:
         for wp in self.wps:
             print("({}, {}, {})".format(wp.x, wp.y, wp.z))
 
-    def aciyi_ve_uzakligi_ayarla(self, fixed_yaw, distance):
-        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
+    def __aciyi_ve_uzakligi_ayarla(self, distance):
+        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], self.fixed_yaw)
         if math.isinf(self.front):
             self.change_mode(MODE_RTL)
             self.disconnect()
         self.move_local(y=(self.front - distance))
-        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
-        print("acimi ve uzakligimi ayarladim su an hazirim.")
+        self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], self.fixed_yaw)
+        print("aci ve uzaklik ayarlandi, hazir.")
 
-    def run_mission_with_lidar_wp2wp(self, fixed_yaw, distance):
-        self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+    def __yeni_satira_gec(self):
+        origin = self.wall.origin
+        self.move_global(origin.x, origin.y, origin.z, self.fixed_yaw)
+        self.__aciyi_ve_uzakligi_ayarla(distance=self.config.distance)
+        self.move_local(z=-self.wall.satir_araligi*self.config.font_scale)
+
+    def run_mission_with_lidar_wp2wp(self, distance):
+        self.__aciyi_ve_uzakligi_ayarla(distance=distance)
         config = self.config
+        wall = self.wall
+        config.distance = distance
+        wall.origin = Point(self.latitude, self.longitude, self.altitude - self.home[2])
         sentence = input("Type the sentence.\n")
-        self.wall.sentence = sentence.upper().strip()
-        for c in self.wall.sentence:
-            total_height = 0.0
-            total_width = 0.0
-            wp_list = datas[c]["list"]
-            box_width = datas[c]["width"]
-            for wp in wp_list:
-                total_height += wp.z
-                total_width += wp.x
-                self.is_open = wp.is_open
-                # if self.is_open:
-                #     nozzle_on()
-                # else:
-                #     nozzle_off()
-                self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
-                # nozzle_off()
-                self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+        wall.words = sentence.upper().strip().split(",")
+        word_count = len(wall.words)
+        for i in range(word_count):
+            for c in wall.words[i]:
+                total_height = 0.0
+                total_width = 0.0
+                wp_list = wall.chars[c]["list"]
+                box_width = wall.chars[c]["width"]
+                for wp in wp_list:
+                    total_height += wp.z
+                    total_width += wp.x
+                    self.is_open = wp.is_open
+                    # if self.is_open:
+                    #     nozzle_on()
+                    # else:
+                    #     nozzle_off()
+                    self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
+                    # nozzle_off()
+                    self.__aciyi_ve_uzakligi_ayarla(distance=distance)
+                    time.sleep(0.5)
+                self.is_open = False
+                self.move_local(x=(box_width - total_width)*config.font_scale, z=-total_height*config.font_scale)
+                self.__aciyi_ve_uzakligi_ayarla(distance=distance)
                 time.sleep(0.5)
-            self.is_open = False
-            self.move_local(x=(box_width - total_width)*config.font_scale, z=-total_height*config.font_scale)
-            self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
-            time.sleep(0.5)
+            if i != word_count - 1:
+                self.__yeni_satira_gec()
+            
 
     def run_mission_with_lidar(self, fixed_yaw, distance=None):
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
