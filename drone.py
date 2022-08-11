@@ -36,7 +36,6 @@ class MyDroneHandler(DroneHandler):
         # self.run_mission(3.14, 1.5)
         while True:
             print(str(self.front))
-            print(self.front_status)
         
         # self.land()
         self.change_mode(MODE_RTL)
