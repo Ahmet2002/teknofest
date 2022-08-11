@@ -83,12 +83,12 @@ class MixinNavigation2:
                     total_height += wp.z
                     total_width += wp.x
                     self.is_open = wp.is_open
-                    # if self.is_open:
-                    #     nozzle_on()
-                    # else:
-                    #     nozzle_off()
+                    if self.is_open:
+                        nozzle_on()
+                    else:
+                        nozzle_off()
                     self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
-                    # nozzle_off()
+                    nozzle_off()
                     self.__aciyi_ve_uzakligi_ayarla()
                     time.sleep(0.5)
                 self.is_open = False
