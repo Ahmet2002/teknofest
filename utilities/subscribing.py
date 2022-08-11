@@ -52,6 +52,9 @@ class MixinSubscribing:
     
     def front_range_cb(self, data):
         self.front = data.range
+    
+    def front_status_cb(self, msg):
+        self.front_status = msg.data
 
     def print_pose(self):
         print("----------------------------")

@@ -1,4 +1,5 @@
 import rospy
+from std_msgs.msg import String
 from utilities.service import Service
 from utilities.utils import *
 from utilities.service_handling import MixinServiceHandler
@@ -7,6 +8,7 @@ from utilities.navigation import MixinNavigation
 from utilities.navigation2 import MixinNavigation2
 from utilities.publishing import MixinPublishing
 from utilities.subscribing import MixinSubscribing
+
 
 class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinPublishing, MixinSubscribing, MixinNavigation2):
     def __init__(self):
@@ -31,10 +33,12 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.wall = Wall()
         self.left = 0.0
         self.right = 0.0
+        self.front = 0.0
+        self.front_status = "ok"
         self.wps = []
         self.frequency = 20
         self.connected = False
-        self.sim_mode = True
+        self.sim_mode = False
         self.angle_offset = 0.0
         self.single_lidar_mode = True
         self.is_open = False
@@ -63,6 +67,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
             self.sub_sim_lidar = rospy.Subscriber("/spur/laser/scan", sensor_msgs.msg.LaserScan, self.lidar_sim_cb)
         elif self.single_lidar_mode:
             self.sub_front_range = rospy.Subscriber("/tfmini_ros_node1/range", sensor_msgs.msg.Range, self.front_range_cb)
+            self.sub_lidar_status = rospy.Subscriber("/tfmini_ros_node1/status", String, self.front_status_cb)
         else:
             self.sub_left_range = rospy.Subscriber("/tfmini_ros_node1/range", sensor_msgs.msg.Range, self.left_range_cb)
             self.sub_right_range = rospy.Subscriber("/tfmini_ros_node2/range", sensor_msgs.msg.Range, self.right_range_cb)
