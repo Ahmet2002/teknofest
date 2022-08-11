@@ -3,8 +3,8 @@ import time
 from utilities.droneHanler import DroneHandler
 from utilities.utils import *
 
-# GPIO.setmode(GPIO.BOARD)
-# GPIO.setup(33,GPIO.OUT)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(33,GPIO.OUT)
 
 class MyDroneHandler(DroneHandler):
     def __init__(self):
@@ -25,7 +25,7 @@ class MyDroneHandler(DroneHandler):
         # print("WPNAV_RADIUS SET : ", str(self.set_param(param="WPNAV_RADIUS", value_real=20.0)).upper())
         # print("WPNAV_ACCEL SET : ", str(self.set_param(param="WPNAV_ACCEL", value_real=50.0)).upper())
         # print("WPNAV_ACCEL_Z SET : ", str(self.set_param(param="WPNAV_ACCEL_Z", value_real=50.0)).upper())
-        # print("WP_YAW_BEHAVIOR SET : ", str(self.set_param(param="WP_YAW_BEHAVIOR", value_real=50.0)).upper())
+        # print("WP_YAW_BEHAVIOR SET : ", str(self.set_param(param="WP_YAW_BEHAVIOR", value_real=0.0)).upper())
 
         # self.takeoff(5.0)
         # time.sleep(2.0)
