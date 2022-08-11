@@ -68,6 +68,7 @@ class MixinSubscribing:
         print("altitude : ", self.altitude - self.home[2])
         print("front : ", self.front)
         print("yaw : ", self.yaw)
+        print("is_open: ", str(self.is_open))
 
     def print_vel(self):
         print("----------------------------")

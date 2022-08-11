@@ -13,13 +13,12 @@ class MixinNavigation2:
         new_wp.z += prev_wp.z
         return new_wp
 
-    def get_mission(self):
+    def get_mission(self, sentence):
         del self.wps
         self.wps = []
+        wall = self.wall
 
         prev_wp = Waypoint(self.latitude, self.longitude, self.altitude - self.home[2])
-        wall = self.wall
-        sentence = wall.sentence
         for c in sentence:
             total_height = 0.0
             total_width = 0.0
@@ -54,13 +53,13 @@ class MixinNavigation2:
         origin = self.wall.origin
         self.move_global(origin.x, origin.y, origin.z, self.fixed_yaw)
         self.__aciyi_ve_uzakligi_ayarla()
-        self.move_local(z=-((self.wall.satir_araligi)*self.config.font_scale))
+        self.move_local(z=-((self.wall.satir_araligi + 3.0)*self.config.font_scale))
 
     def __satiri_ortala(self, word):
         total_width = 0.0
         for c in word:
-            total_width += self.wall[c][width]
-        offset = (self.wall.width - 1.0 - total_width) / 2
+            total_width += self.wall.chars[c]["width"]
+        offset = (self.wall.width - 1.0 - total_width * self.config.font_scale) / 2
         self.move_local(x=offset)
         self.__aciyi_ve_uzakligi_ayarla()
 
@@ -98,6 +97,32 @@ class MixinNavigation2:
                 time.sleep(0.5)
             if i != word_count - 1:
                 self.__yeni_satira_gec()
+
+    def run_mission_with_lidar_word_to_word(self, distance):
+        config = self.config
+        wall = self.wall
+        config.distance = distance
+        self.__aciyi_ve_uzakligi_ayarla()
+        wall.origin = Point(self.latitude, self.longitude, self.altitude - self.home[2])
+        sentence = input("Type the sentence.\n")
+        wall.words = sentence.upper().strip().split(",")
+        word_count = len(wall.words)
+        for i in range(word_count):
+            self.__satiri_ortala(word=wall.words[i])
+            for c in wall.words[i]:
+                self.get_mission(sentence=c)
+                for wp in self.wps:
+                    self.is_open = wp.is_open
+                    # if self.is_open:
+                    #     nozzle_on()
+                    # else:
+                    #     nozzle_off()
+                    self.move_global(lat=wp.x, lon=wp.y, alt=wp.z, yaw=self.fixed_yaw)
+                    # nozzle_off()
+                    time.sleep(0.5)
+                self.__aciyi_ve_uzakligi_ayarla()
+            if i != word_count - 1:
+                self.__yeni_satira_gec()
             
 
     def run_mission_with_lidar(self, fixed_yaw, distance=None):
@@ -106,7 +131,7 @@ class MixinNavigation2:
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
         sentence = input("Type the sentence.\n")
         self.wall.sentence = sentence.upper().strip()
-        self.get_mission()
+        self.get_mission(sentence=self.wall.sentence)
         for wp in self.wps:
             self.is_open = wp.is_open
             # if self.is_open:
@@ -122,7 +147,7 @@ class MixinNavigation2:
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
         sentence = input("Type the sentence.\n")
         self.wall.sentence = sentence.upper().strip()
-        self.get_mission()
+        self.get_mission(sentence=self.wall.sentence)
         for wp in self.wps:
             self.is_open = wp.is_open
             # if self.is_open:

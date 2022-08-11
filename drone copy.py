@@ -30,10 +30,20 @@ class MyDroneHandler(DroneHandler):
         self.takeoff(5.0)
         time.sleep(2.0)
 
-
+        # self.set_param(param="PRX_TYPE", value_real=4.0)
+        # self.duvara_bak(distance=2.0)
+        # self.wall.sentence = input("Type the sentence.\n")
+        # self.run_mission()
         self.run_mission_with_lidar_word_to_word(2.0)
         # self.run_mission_with_lidar(3.14, 2.0)
         # self.run_mission(3.14, 1.5)
+        # self.change_mode(MODE_AUTO)
+        # print(str(self.clear_wps()))
+        # self.add_wp_to_wp_list(3,22,True,True,0.0,0.0,0.0,float('nan'), -35.36326767, 149.16524363, 50)
+        # self.add_wp_to_wp_list(3,16,True,True,0.0,0.0,0.0,float('nan'), -35.36170368, 149.16500413, 50)
+        # self.add_wp_to_wp_list(3,16,False,True,0.0,0.0,0.0,float('nan'), -35.36232276, 149.16337969, 50)
+        # self.add_wp_to_wp_list(3,20,False,True,0.0,0.0,0.0,float('nan'), -35.36300493, 149.16517528, 50)
+        # self.push_wps()
         
         # self.land()
         self.change_mode(MODE_RTL)

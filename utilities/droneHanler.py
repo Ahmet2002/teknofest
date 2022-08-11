@@ -22,7 +22,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.roll = 0.0
         self.pitch = 0.0
         self.yaw = 0.0
-        self.fixed_yaw = 3.14
+        self.fixed_yaw = (180 * math.pi / 180)
         self.xprime = 0.0
         self.yprime = 0.0
         self.zprime = 0.0
@@ -37,6 +37,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.sim_mode = True
         self.angle_offset = 0.0
         self.single_lidar_mode = True
+        self.is_open = False
 
         # Services
         self.service_arm = Service("/mavros/cmd/arming", mavros_msgs.srv.CommandBool)

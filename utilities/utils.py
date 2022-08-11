@@ -66,7 +66,7 @@ def quaternion_to_euler(w, x, y, z):
 	return X, Y, Z 
 
 class Point:
-	def __init____init__(self, x=0.0, y=0.0, z=0.0):
+	def __init__(self, x=0.0, y=0.0, z=0.0):
 		self.x = x
 		self.y = y
 		self.z = z
@@ -110,7 +110,7 @@ MODE_INITIALISING = "INITIALISING"
 class Config:
 	def __init__(self):
 		self.max_yaw_vel = 0.3
-		self.font_scale = 0.4
+		self.font_scale = 0.35
 		self.distance = 5.0
 
 class Wall:
@@ -119,78 +119,78 @@ class Wall:
 		self.width = 8.0
 		self.angle = 0.0
 		self.is_init = False
-		self.origin = None
+		self.origin = Point()
 		self.words = []
-		self.satir_araligi = 0.5
+		self.satir_araligi = 1
 		self.chars = {
 		"A" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.0, z=3.0, is_open=True), Waypoint(x=1.0, z=-3.0, is_open=True), Waypoint(x=-1.5, z=1.5), Waypoint(x=1.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"B" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"C" : { "list" : [Waypoint(x=1.5), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"D" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"G" : { "list" : [Waypoint(x=1.5), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-0.75, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"H" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5), Waypoint(z=3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"J" : { "list" : [Waypoint(z=-2.25), Waypoint(z=-0.75, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"I" : { "list" : [Waypoint(z=-3.0, is_open=True)],
-			"width" : 0.5},
+			"width" : 0.75},
 		"İ" : { "list" : [Waypoint(z=-0.25, is_open=True), Waypoint(z=-0.25), Waypoint(z=-2.5, is_open=True)],
-			"width" : 0.5},
+			"width" : 0.75},
 		"L" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"M" : { "list" : [Waypoint(z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=1.0, z=-1.5, is_open=True), Waypoint(x=1.0, z=1.5, is_open=True), Waypoint(z=-3.0, is_open=True)],
-			"width" : 2.5},
+			"width" : 2.75},
 		"P" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"R" : { "list" : [Waypoint(z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(x=1.5, z=-1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"U" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"V" : { "list" : [Waypoint(x=0.75, z=-3.0, is_open=True), Waypoint(x=0.75, z=3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"Y" : { "list" : [Waypoint(x=0.75, z=-1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=0.75, z=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"Z" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(x=-1.5, z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"1" : { "list" : [Waypoint(z=-0.75), Waypoint(x=0.75, z=0.75, is_open=True), Waypoint(z=-3.0, is_open=True)],
-			"width" : 1.25},
+			"width" : 1.5},
 		"3" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"4" : { "list" : [Waypoint(z=-2.25), Waypoint(x=1.25, z=2.25, is_open=True), Waypoint(z=-3.0, is_open=True), Waypoint(x=-1.25, z=0.75), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"5" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"6" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"7" : { "list" : [Waypoint(x=1.5, is_open=True), Waypoint(x=0.75, z=-3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"8" : { "list" : [Waypoint(z=-1.5), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=-1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"9" : { "list" : [Waypoint(x=1.5, z=-3.0), Waypoint(z=3.0, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
-		"T" : { "list" : [Waypoint(x=1.5, is_open=True),Waypoint(x=-0.75),Waypoint(z=-3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
+		"T" : { "list" : [Waypoint(x=2.0, is_open=True),Waypoint(x=-1.0),Waypoint(z=-3.0, is_open=True)],
+			"width" : 2.75},
 		"E" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"K" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(x=1.5), Waypoint(x=-1.5, z=1.5, is_open=True), Waypoint(x=1.5, z=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"N" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=3.0), Waypoint(x=1.5 ,z=-3.0, is_open=True), Waypoint(z=3.0, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"O" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"F" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(z=2.0), Waypoint(x=1.5, is_open=True), Waypoint(z=1.0), Waypoint(x=-1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"S" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"2" : { "list" : [Waypoint(1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=-1.5, is_open=True), Waypoint(z=-1.5, is_open=True), Waypoint(x=1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		"0" : { "list" : [Waypoint(z=-3.0, is_open=True), Waypoint(1.5, is_open=True), Waypoint(z=3.0, is_open=True), Waypoint(-1.5, is_open=True)],
-			"width" : 2.0},
+			"width" : 2.25},
 		}
 
 	

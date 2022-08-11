@@ -117,18 +117,17 @@ class MixinNavigation:
         (target_x, target_y, target_z) = wall.get_exact_loc(x=x, y=y, transform=self.transform)
         self.move_global_safe(target_x, target_y, target_z)
 
-    def run_mission(self, fixed_yaw, distance, vel=0.2):
-        self.aciyi_ve_uzakligi_ayarla(fixed_yaw=fixed_yaw, distance=distance)
+    def run_mission(self, distance, vel=0.2):
+        self.__aciyi_ve_uzakligi_ayarla()
         config = self.config
         config.distance = distance
-        self.fixed_yaw = fixed_yaw
         sentence = input("Type the sentence.\n")
         self.wall.sentence = sentence.upper().strip()
         for c in self.wall.sentence:
             total_height = 0.0
             total_width = 0.0
-            wp_list = datas[c]["list"]
-            box_width = datas[c]["width"]
+            wp_list = self.wall.chars[c]["list"]
+            box_width = self.wall.chars[c]["width"]
             for wp in wp_list:
                 total_height += wp.z * config.font_scale
                 total_width += wp.x * config.font_scale

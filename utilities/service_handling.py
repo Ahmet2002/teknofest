@@ -11,7 +11,7 @@ class MixinServiceHandler:
         result = self.service_caller(self.service_arm)
         return result.success
 
-    def takeoff(self, altitude=5.0, tolerance=0.1):
+    def takeoff(self, altitude=5.0, tolerance=0.2):
         if self.current_mode != MODE_GUIDED:
             rospy.loginfo("Drone is not in GUIDED mode\nChanging to GUIDED, " + str(self.change_mode(MODE_GUIDED)))
         if not self.is_armed and not self.arm(True):
