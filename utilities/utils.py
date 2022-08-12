@@ -110,7 +110,7 @@ MODE_INITIALISING = "INITIALISING"
 class Config:
 	def __init__(self):
 		self.max_yaw_vel = 0.3
-		self.font_scale = 0.3
+		self.font_scale = 1.0
 		self.distance = 5.0
 
 class Wall:
