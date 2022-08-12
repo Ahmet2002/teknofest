@@ -42,6 +42,9 @@ class MixinNavigation2:
 
     def __aciyi_ve_uzakligi_ayarla(self):
         self.move_global(lat=self.latitude, lon=self.longitude, alt=(self.altitude - self.home[2], self.fixed_yaw))
+        while math.isinf(self.front):
+            self.set_vel_local(xprime=0.1)
+            self.rate.sleep()
         self.move_local(y=(self.front - self.config.distance))
         self.move_global(lat=self.latitude, lon=self.longitude, alt=(self.altitude - self.home[2], self.fixed_yaw))
         print("aci ve uzaklik ayarlandi, hazir.")
@@ -51,6 +54,7 @@ class MixinNavigation2:
         self.move_global(origin.x, origin.y, origin.z, self.fixed_yaw)
         self.move_local(z=-((self.wall.satir_araligi + 3.0)*self.config.font_scale))
         self.__aciyi_ve_uzakligi_ayarla()
+        time.sleep(0.5)
 
     def __satiri_ortala(self, word):
         total_width = 0.0
@@ -59,6 +63,21 @@ class MixinNavigation2:
         offset = (self.wall.width - 1.0 - total_width * self.config.font_scale) / 2
         self.move_local(x=offset)
         self.__aciyi_ve_uzakligi_ayarla()
+        time.sleep(0.5)
+    
+    def __check_sentence(self, words):
+        satir_sayisi = len(words)
+        total_height = satir_sayisi * 3.0 + (satir_sayisi - 1) * self.wall.satir_araligi * self.config.font_scale
+        if total_height > (self.wall.width - 1.0):
+            return False
+        for word in words:
+            total_width = 0.0
+            for c in word:
+                total_width += self.wall.chars[c]["width"]
+            if total_width > self.wall.width:
+                return False
+        return True
+
 
     def run_mission_with_lidar_wp2wp(self, distance):
         config = self.config
@@ -68,6 +87,11 @@ class MixinNavigation2:
         wall.origin = Point(self.latitude, self.longitude, self.altitude - self.home[2])
         sentence = input("Type the sentence.\n")
         wall.words = sentence.upper().strip().split(",")
+        while not self.check_sentence(words=wall.words):
+            print("Sentence doesn't fit to wall.\n please try again with another one")
+            sentence = input("Type the sentence.\n")
+            wall.words = sentence.upper().strip().split(",")
+
         word_count = len(wall.words)
         for i in range(word_count):
             self.__satiri_ortala(word=wall.words[i])
@@ -80,12 +104,12 @@ class MixinNavigation2:
                     total_height += wp.z
                     total_width += wp.x
                     self.is_open = wp.is_open
-                    if self.is_open:
-                        nozzle_on()
-                    else:
-                        nozzle_off()
+                    # if self.is_open:
+                    #     nozzle_on()
+                    # else:
+                    #     nozzle_off()
                     self.move_local(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale))
-                    nozzle_off()
+                    # nozzle_off()
                     self.__aciyi_ve_uzakligi_ayarla()
                     time.sleep(0.5)
                 self.is_open = False
@@ -103,6 +127,10 @@ class MixinNavigation2:
         wall.origin = Point(self.latitude, self.longitude, self.altitude - self.home[2])
         sentence = input("Type the sentence.\n")
         wall.words = sentence.upper().strip().split(",")
+        while not self.check_sentence(words=wall.words):
+            print("Sentence doesn't fit to wall.\n please try again with another one")
+            sentence = input("Type the sentence.\n")
+            wall.words = sentence.upper().strip().split(",")
         word_count = len(wall.words)
         for i in range(word_count):
             self.__satiri_ortala(word=wall.words[i])

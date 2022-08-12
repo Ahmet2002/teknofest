@@ -6,7 +6,6 @@ class MixinNavigation:
     def duvara_bak(self, distance=5.0):
         pid_yaw = PID(Kp=0.3, Ki=0.2, Kd=1.0, setpoint=0.0, sample_time=0.1)
         pid_yaw.output_limits = (-0.3, 0.3)
-        self.config.distance = distance
         diff = 0.0
         control = 0.0
         while not rospy.is_shutdown():
@@ -74,48 +73,55 @@ class MixinNavigation:
             return True
         return False
 
-    def go_most_left(self):
+    def __go_most_left(self):
         while not rospy.is_shutdown():
             if not self.move_local_safe(x=-1.0):
                 break
-        self.move_local(x=1.5)
+        self.move_local(x=1.0)
     
-    def go_most_right(self):
+    def __go_most_right(self):
         while not rospy.is_shutdown():
             if not self.move_local_safe(x=1.0):
                 break
-        self.move_local(x=-1.5)
+        self.move_local(x=-1.0)
 
-    def go_most_up(self):
-        while not rospy.is_shutdown():
+    def __go_most_up(self):
+        while (not rospy.is_shutdown()) and (self.z < 10.0):
             if not self.move_local_safe(z=1.0):
                 break
-        self.move_local(z=-1.5)
+        self.move_local(z=-1.0)
 
-    def go_most_down(self):
-        while not rospy.is_shutdown():
+    def __go_most_down(self):
+        while (not rospy.is_shutdown()) and (self.z > 3.0):
             if not self.move_local_safe(z=-1.0):
                 break
-        self.move_local(z=1.5)
+        self.move_local(z=1.0)
 
     def init_wall(self, distance=5.0):
+        self.config.distance = distance
         self.duvara_bak(distance=distance)
-        self.go_most_up()
-        print("en yukariya gitti")
-        self.go_most_left()
-        print("En sola gitti")
+        self.__go_most_right()
+        self.__go_most_down()
+        (x1, y1, z1) = (self.x, self.y, self.z)
+        self.__go_most_up()
+        self.__go_most_left()
+        (x2, y2, z2) = (self.x, self.y, self.z)
+        self.wall.height = z2 - z1
+        self.width = get_distance(x1, y1, z1, x2, y2, z2)
+        self.wall.angle = math.atan2(y1 - y2, x1 - x2)
+        self.wall.is_init = True
 
     def go_2d_on_wall(self, x=0.0, y=0.0):
         wall = self.wall
         if not wall.is_init:
             rospy.logerr("Error on go_2d_on_wall() function.")
             rospy.logerr("wall has not been initialized yet.")
-            return
+            return False
         if not wall.in_borders(x=x, y=y):
             rospy.logerr("out of walls borders!")
-            return
+            return False
         (target_x, target_y, target_z) = wall.get_exact_loc(x=x, y=y, transform=self.transform)
-        self.move_global_safe(target_x, target_y, target_z)
+        return self.move_global_safe(target_x, target_y, target_z)
 
     def run_mission(self, distance, vel=0.2):
         self.__aciyi_ve_uzakligi_ayarla()
@@ -132,17 +138,23 @@ class MixinNavigation:
                 total_height += wp.z * config.font_scale
                 total_width += wp.x * config.font_scale
                 self.is_open = wp.is_open
+                # if self.is_open:
+                    #     nozzle_on()
+                    # else:
+                    #     nozzle_off()
                 if not self.move_local_safe(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale), vel=vel):
                     self.change_mode(MODE_RTL)
                     self.disconnect()
+                # nozzle_off()
+                time.sleep(0.5)
             self.is_open = False
             if not self.move_local_safe(x=(box_width - total_width), z=-total_height, vel=vel):
                 self.change_mode(MODE_RTL)
                 self.disconnect()
+            time.sleep(0.5)
 
     def yazi_yaz(self, distance_to_wall):
         # self.init_wall(distance_to_wall)
         self.init_wall(distance=distance_to_wall)
-        self.wall.sentence = input("Please enter the sentence to be painted on the wall\n")
         self.run_mission()
         rospy.logdebug("mission completed !")
