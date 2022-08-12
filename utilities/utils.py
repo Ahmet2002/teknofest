@@ -111,7 +111,7 @@ class Config:
 	def __init__(self):
 		self.max_yaw_vel = 0.3
 		self.font_scale = 1.0
-		self.distance = 5.0
+		self.distance = 3.0
 
 class Wall:
 	def __init__(self):
@@ -121,7 +121,7 @@ class Wall:
 		self.is_init = False
 		self.origin = Point()
 		self.words = []
-		self.satir_araligi = 1
+		self.satir_araligi = 1.0
 		self.chars = {
 		"A" : { "list" : [Waypoint(z=-3.0), Waypoint(x=1.0, z=3.0, is_open=True), Waypoint(x=1.0, z=-3.0, is_open=True), Waypoint(x=-1.5, z=1.5), Waypoint(x=1.0, is_open=True)],
 			"width" : 2.25},

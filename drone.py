@@ -31,11 +31,11 @@ class MyDroneHandler(DroneHandler):
         self.takeoff(5.0)
         time.sleep(2.0)
 
+        self.fixed_yaw = self.yaw
         # self.run_mission_with_lidar_word_to_word(distance=2.4)
-        # # self.run_mission_with_lidar(3.14, 2.0)
+        # # self.run_mission_with_lidar(fixed_yaw=3.14, distance=2.0)
         # # self.run_mission(3.14, 1.5)
-        fixed_yaw = self.yaw
-        self.run_mission_without_lidar(fixed_yaw=fixed_yaw)
+        self.run_mission_without_lidar(fixed_yaw=self.fixed_yaw)
 
         self.land()
         # self.change_mode(MODE_RTL)

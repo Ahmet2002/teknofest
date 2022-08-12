@@ -50,6 +50,7 @@ class MixinNavigation2:
         origin = self.wall.origin
         self.move_global(origin.x, origin.y, origin.z, self.fixed_yaw)
         self.move_local(z=-((self.wall.satir_araligi + 3.0)*self.config.font_scale))
+        self.__aciyi_ve_uzakligi_ayarla()
 
     def __satiri_ortala(self, word):
         total_width = 0.0
@@ -57,6 +58,7 @@ class MixinNavigation2:
             total_width += self.wall.chars[c]["width"]
         offset = (self.wall.width - 1.0 - total_width * self.config.font_scale) / 2
         self.move_local(x=offset)
+        self.__aciyi_ve_uzakligi_ayarla()
 
     def run_mission_with_lidar_wp2wp(self, distance):
         config = self.config
