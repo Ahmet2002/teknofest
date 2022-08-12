@@ -35,7 +35,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         self.right = 0.0
         self.front = 0.0
         self.wps = []
-        self.frequency = 20
+        self.frequency = 2
         self.connected = False
         self.sim_mode = False
         self.angle_offset = 0.0
