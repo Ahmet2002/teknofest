@@ -138,18 +138,17 @@ class MixinNavigation2:
             nozzle_off()
             time.sleep(0.7)
 
-    def run_mission_without_lidar(self):
-        # self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
+    def run_mission_without_lidar(self, fixed_yaw):
         sentence = input("Type the sentence.\n")
         self.wall.sentence = sentence.upper().strip()
         self.get_mission(sentence=self.wall.sentence)
         for wp in self.wps:
             self.is_open = wp.is_open
-            if self.is_open:
-                nozzle_on()
-            else:
-                nozzle_off()
+            # if self.is_open:
+            #     nozzle_on()
+            # else:
+            #     nozzle_off()
             print("is_open : ", str(wp.is_open))
-            self.move_global(wp.x, wp.y, wp.z, yaw=self.yaw)
-            nozzle_off()
+            self.move_global(wp.x, wp.y, wp.z, yaw=fixed_yaw)
+            # nozzle_off()
             time.sleep(0.7)
