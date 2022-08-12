@@ -32,11 +32,11 @@ class MyDroneHandler(DroneHandler):
         time.sleep(2.0)
 
         self.run_mission_with_lidar_word_to_word(distance=2.4)
-        # self.run_mission_with_lidar(3.14, 2.0)
-        # self.run_mission(3.14, 1.5)
+        # # self.run_mission_with_lidar(3.14, 2.0)
+        # # self.run_mission(3.14, 1.5)
         
-        # self.land()
-        self.change_mode(MODE_RTL)
+        self.land()
+        # self.change_mode(MODE_RTL)
         self.disconnect()
 
 
