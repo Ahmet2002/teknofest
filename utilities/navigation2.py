@@ -87,7 +87,7 @@ class MixinNavigation2:
         wall.origin = Point(self.latitude, self.longitude, self.altitude - self.home[2])
         sentence = input("Type the sentence.\n")
         wall.words = sentence.upper().strip().split(",")
-        while not self.check_sentence(words=wall.words):
+        while not self.__check_sentence(words=wall.words):
             print("Sentence doesn't fit to wall.\n please try again with another one")
             sentence = input("Type the sentence.\n")
             wall.words = sentence.upper().strip().split(",")
@@ -127,7 +127,7 @@ class MixinNavigation2:
         wall.origin = Point(self.latitude, self.longitude, self.altitude - self.home[2])
         sentence = input("Type the sentence.\n")
         wall.words = sentence.upper().strip().split(",")
-        while not self.check_sentence(words=wall.words):
+        while not self.__check_sentence(words=wall.words):
             print("Sentence doesn't fit to wall.\n please try again with another one")
             sentence = input("Type the sentence.\n")
             wall.words = sentence.upper().strip().split(",")
@@ -150,7 +150,7 @@ class MixinNavigation2:
                 self.__yeni_satira_gec()
             
 
-    def run_mission_with_lidar(self, fixed_yaw, distance=None):
+    def run_mission_with_lidar(self, fixed_yaw, distance):
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
         self.move_local(y=(self.front - distance))
         self.move_global(self.latitude, self.longitude, self.altitude - self.home[2], fixed_yaw)
