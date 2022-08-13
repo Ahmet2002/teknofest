@@ -65,7 +65,7 @@ class DroneHandler(MixinServiceHandler, MixinRosHandler, MixinNavigation, MixinP
         if self.sim_mode:
             self.sub_sim_lidar = rospy.Subscriber("/spur/laser/scan", sensor_msgs.msg.LaserScan, self.lidar_sim_cb)
         elif self.single_lidar_mode:
-            self.sub_front_range = rospy.Subscriber("/tfmini_ros_node1/range", sensor_msgs.msg.Range, self.front_range_cb)
+            self.sub_front_range = rospy.Subscriber("/tfmini_ros_node/range", sensor_msgs.msg.Range, self.front_range_cb)
         else:
             self.sub_left_range = rospy.Subscriber("/tfmini_ros_node1/range", sensor_msgs.msg.Range, self.left_range_cb)
             self.sub_right_range = rospy.Subscriber("/tfmini_ros_node2/range", sensor_msgs.msg.Range, self.right_range_cb)

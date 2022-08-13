@@ -67,13 +67,14 @@ class MixinNavigation2:
     
     def __check_sentence(self, words):
         satir_sayisi = len(words)
-        total_height = satir_sayisi * 3.0 + (satir_sayisi - 1) * self.wall.satir_araligi * self.config.font_scale
+        total_height = (satir_sayisi * 3.0 + (satir_sayisi - 1) * self.wall.satir_araligi) * self.config.font_scale
         if total_height > (self.wall.height - 1.0):
             return False
         for word in words:
             total_width = 0.0
             for c in word:
-                total_width += self.wall.chars[c]["width"] * self.config.font_scale
+                total_width += self.wall.chars[c]["width"]
+            total_width *= self.config.font_scale
             if total_width > (self.wall.width - 1.0):
                 return False
         return True
