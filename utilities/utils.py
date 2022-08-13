@@ -11,13 +11,13 @@ import math
 import rospy
 import numpy as np
 from utilities.service import Service
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
-# def nozzle_on():
-# 	GPIO.output(33,GPIO.HIGH)
+def nozzle_on():
+	GPIO.output(33,GPIO.HIGH)
 
-# def nozzle_off():
-# 	GPIO.output(33,GPIO.LOW)
+def nozzle_off():
+	GPIO.output(33,GPIO.LOW)
 
 
 def angle2radian(angle: float):

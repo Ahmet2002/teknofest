@@ -138,14 +138,14 @@ class MixinNavigation:
                 total_height += wp.z * config.font_scale
                 total_width += wp.x * config.font_scale
                 self.is_open = wp.is_open
-                # if self.is_open:
-                    #     nozzle_on()
-                    # else:
-                    #     nozzle_off()
+                if self.is_open:
+                        nozzle_on()
+                    else:
+                        nozzle_off()
                 if not self.move_local_safe(x=(wp.x*config.font_scale), z=(wp.z*config.font_scale), vel=vel):
                     self.change_mode(MODE_RTL)
                     self.disconnect()
-                # nozzle_off()
+                nozzle_off()
                 time.sleep(0.5)
             self.is_open = False
             if not self.move_local_safe(x=(box_width - total_width), z=-total_height, vel=vel):
@@ -154,7 +154,6 @@ class MixinNavigation:
             time.sleep(0.5)
 
     def yazi_yaz(self, distance_to_wall):
-        # self.init_wall(distance_to_wall)
         self.init_wall(distance=distance_to_wall)
         self.run_mission()
         rospy.logdebug("mission completed !")
