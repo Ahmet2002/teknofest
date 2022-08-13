@@ -33,7 +33,7 @@ class MyDroneHandler(DroneHandler):
         self.takeoff(5.0)
         time.sleep(2.0)
 
-        self.run_mission_with_lidar_word_to_word(distance=2.4)
+        # self.run_mission_with_lidar_word_to_word(distance=2.4)
         # run_mission_with_lidar_wp2wp(distance=2.4)
         # self.run_mission_with_lidar(fixed_yaw=self.fixed_yaw, distance=2.4)
         # self.run_mission(3.14, 2.4)
